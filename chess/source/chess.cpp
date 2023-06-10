@@ -1,8 +1,6 @@
-// #include <Wigner.hpp>
+#include <Wigner.hpp>
 
-#include "Wigner/Core/Application.hpp"
-#include "Wigner/Core/Entrypoint.hpp"
-
+#include "game.hpp"
 #include <iostream>
 
 class Testbed : public Wigner::Application {

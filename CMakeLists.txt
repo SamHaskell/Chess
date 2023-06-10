@@ -3,7 +3,7 @@ cmake_minimum_required(
 )
 
 project(
-    WignerDev
+    ChessDev
     VERSION 0.1
     LANGUAGES CXX
 )
@@ -14,4 +14,4 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
 add_subdirectory(engine)
 
 # Client exe compiled here
-add_subdirectory(testbed)
+add_subdirectory(chess)

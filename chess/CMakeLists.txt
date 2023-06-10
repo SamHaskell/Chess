@@ -1,13 +1,13 @@
 project(
-    WignerTest
+    Chess
     VERSION 0.1
-    DESCRIPTION "Wigner Engine Testbed"
+    DESCRIPTION "Chess App"
     LANGUAGES CXX
 )
 
 set(
     LOCAL_SOURCES
-    ${PROJECT_SOURCE_DIR}/source/testbed.cpp
+    ${PROJECT_SOURCE_DIR}/source/chess.cpp
 )
 
 set(
