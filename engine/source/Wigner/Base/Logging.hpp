@@ -27,17 +27,17 @@ void CoreLog(LogLevel verbosity, const char *msg, const char *file, i32 line, ..
 #define USE_LOGGING
 
 #ifdef USE_LOGGING
-    #define FATAL(msg, ...) CoreLog(LOG_LEVEL_FATAL, msg, __FILE__, __LINE__, ##__VA_ARGS__)
-    #define ERROR(msg, ...) CoreLog(LOG_LEVEL_ERROR, msg, __FILE__, __LINE__, ##__VA_ARGS__)
-    #define WARN(msg, ...)  CoreLog(LOG_LEVEL_WARN, msg, __FILE__, __LINE__, ##__VA_ARGS__)
-    #define INFO(msg, ...)  CoreLog(LOG_LEVEL_INFO, msg, __FILE__, __LINE__, ##__VA_ARGS__)
-    #define DEBUG(msg, ...) CoreLog(LOG_LEVEL_DEBUG, msg, __FILE__, __LINE__, ##__VA_ARGS__)
-    #define TRACE(msg, ...) CoreLog(LOG_LEVEL_TRACE, msg, __FILE__, __LINE__, ##__VA_ARGS__)
+    #define LOG_FATAL(msg, ...) CoreLog(LOG_LEVEL_FATAL, msg, __FILE__, __LINE__, ##__VA_ARGS__)
+    #define LOG_ERROR(msg, ...) CoreLog(LOG_LEVEL_ERROR, msg, __FILE__, __LINE__, ##__VA_ARGS__)
+    #define LOG_WARN(msg, ...)  CoreLog(LOG_LEVEL_WARN, msg, __FILE__, __LINE__, ##__VA_ARGS__)
+    #define LOG_INFO(msg, ...)  CoreLog(LOG_LEVEL_INFO, msg, __FILE__, __LINE__, ##__VA_ARGS__)
+    #define LOG_DEBUG(msg, ...) CoreLog(LOG_LEVEL_DEBUG, msg, __FILE__, __LINE__, ##__VA_ARGS__)
+    #define LOG_TRACE(msg, ...) CoreLog(LOG_LEVEL_TRACE, msg, __FILE__, __LINE__, ##__VA_ARGS__)
 #else
-    #define FATAL(msg, ...)
-    #define ERROR(msg, ...)
-    #define WARN(msg, ...)
-    #define INFO(msg, ...)
-    #define DEBUG(msg, ...)
-    #define TRACE(msg, ...)
+    #define LOG_FATAL(msg, ...)
+    #define LOG_ERROR(msg, ...)
+    #define LOG_WARN(msg, ...)
+    #define LOG_INFO(msg, ...)
+    #define LOG_DEBUG(msg, ...)
+    #define LOG_TRACE(msg, ...)
 #endif

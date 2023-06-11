@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Wigner/Base/Base.hpp"
 #include "Wigner/Core/Application.hpp"
 
 extern Wigner::Application *Wigner::CreateApplication();

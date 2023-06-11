@@ -37,6 +37,8 @@ set(
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Core/Entrypoint.hpp
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Core/Application.hpp
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Core/Window.hpp
+
+    ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Events/Events.hpp
 )
 
 set(
@@ -46,6 +48,8 @@ set(
 
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Core/Application.cpp
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Core/Window.cpp
+
+    ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Events/Events.cpp
 )
 
 add_library(

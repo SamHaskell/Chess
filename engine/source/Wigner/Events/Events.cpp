@@ -1,0 +1,29 @@
+#include "Wigner/Events/Events.hpp"
+
+#include <sstream>
+
+namespace Wigner {
+    std::string KeyEvent::ToString() {
+        std::stringstream ss;
+        ss << "KeyEvent: " << KeyActionStrings[Action] << " on " << KeyCode;
+        return ss.str();
+    }
+
+    std::string MouseButtonEvent::ToString() {
+        std::stringstream ss;
+        ss << "MouseButtonEvent: " << MouseButtonActionStrings[Action] << " on " << ButtonCode;
+        return ss.str();
+    }
+
+    std::string MouseMoveEvent::ToString() {
+        std::stringstream ss;
+        ss << "MouseMoveEvent: Cursor move to (" << X << ", " << Y << ")";
+        return ss.str();
+    }
+
+    std::string WindowCloseEvent::ToString() {
+        std::stringstream ss;
+        ss << "WindowCloseEvent: Request to close window recieved";
+        return ss.str();
+    }
+}
