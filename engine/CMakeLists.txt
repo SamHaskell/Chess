@@ -34,9 +34,10 @@ set(
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Base/Logging.hpp
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Base/Base.hpp
 
-    ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Core/Entrypoint.hpp
+    ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Core/Entrypoint.h
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Core/Application.hpp
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Core/Window.hpp
+    ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Core/Layer.hpp
 
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Events/Events.hpp
 )

@@ -1,10 +1,5 @@
 #include "Wigner/Core/Application.hpp"
 
-#include "Wigner/Events/Events.hpp"
-
-#include "glad/glad.h"
-#include <iostream>
-
 namespace Wigner
 {
     Application::Application()
@@ -27,23 +22,22 @@ namespace Wigner
         return true;
     }
 
-    bool Application::OnEvent(Event e)
+    void Application::SetLayer(std::unique_ptr<Layer> layer) {
+        m_Layer = std::move(layer);
+    }
+
+    bool Application::OnEvent(Event &e)
     {
-        switch(e.Tag) {
-            case EventTag::KeyEvent:
-                LOG_INFO(e.KeyEvent.ToString().c_str());
-                break;
-            case EventTag::MouseButtonEvent:
-                LOG_INFO(e.MouseButtonEvent.ToString().c_str());
-                break;
-            case EventTag::MouseMoveEvent:
-                LOG_INFO(e.MouseMoveEvent.ToString().c_str());
-                break;
-            case EventTag::WindowCloseEvent:
-                LOG_INFO(e.WindowCloseEvent.ToString().c_str());
-                m_Running = false;
-                break;
+        switch (e.Tag)
+        {
+        case EventTag::KeyEvent:
+            LOG_INFO(e.KeyEvent.ToString().c_str());
+            break;
+        case EventTag::WindowCloseEvent:
+            m_Running = false;
+            break;
         }
+        m_Layer->OnEvent(e);
         return true;
     }
 }

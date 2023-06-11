@@ -1,7 +1,13 @@
 #include "game.hpp"
 
 namespace Chess {
-    void SayChess() {
-        std::cout << "Chess!" << std::endl;
-    }
+    bool Game::OnEvent(Wigner::Event &e) {
+        switch (e.Tag)
+        {
+            case Wigner::EventTag::KeyEvent:
+                LOG_INFO(e.KeyEvent.ToString().c_str());
+                break;
+        }
+        return true;   
+    };
 }

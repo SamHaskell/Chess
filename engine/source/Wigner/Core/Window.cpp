@@ -22,7 +22,7 @@ namespace Wigner
         glfwMakeContextCurrent(m_WindowHandle);
 
         gladLoadGL();
-        glClearColor(0.9, 0.9, 0.9, 1.0);
+        glClearColor(0.1, 0.1, 0.1, 1.0);
 
         glfwSetWindowUserPointer(m_WindowHandle, &m_WindowState);
 
@@ -34,10 +34,9 @@ namespace Wigner
                 glfwSetWindowShouldClose(window, GLFW_FALSE);
             } });
 
-        glfwSetKeyCallback(m_WindowHandle, [](GLFWwindow *window, i32 key, i32 scancode, i32 action, i32 mods)
-                           {
+        glfwSetKeyCallback(m_WindowHandle, [](GLFWwindow *window, i32 key, i32 scancode, i32 action, i32 mods) {
             auto state = (WindowState*)glfwGetWindowUserPointer(window);
-            Event e;
+            Event e = {EventTag::KeyEvent};
             switch (action) {
                 case GLFW_PRESS:
                     e.KeyEvent = {key, KeyAction::KEY_PRESS};
@@ -49,10 +48,10 @@ namespace Wigner
                     e.KeyEvent = {key, KeyAction::KEY_REPEAT};
                     break;
             }
-            state->Callback(e);
-            });
+            state->Callback(e); }
+        );
 
-        glfwSetMouseButtonCallback(m_WindowHandle, [](GLFWwindow* window, i32 button, i32 action, i32 mods) {
+        glfwSetMouseButtonCallback(m_WindowHandle, [](GLFWwindow *window, i32 button, i32 action, i32 mods) {
             auto state = (WindowState*)glfwGetWindowUserPointer(window);
             Event e = {EventTag::MouseButtonEvent};
             switch (action) {
@@ -63,16 +62,15 @@ namespace Wigner
                     e.MouseButtonEvent = {button, MouseButtonAction::MOUSEBUTTON_RELEASE};
                 break;
             }
-            state->Callback(e);
-        });
+            state->Callback(e); }
+        );
 
-        glfwSetCursorPosCallback(m_WindowHandle, [](GLFWwindow* window, f64 xpos, f64 ypos) {
-            auto state = (WindowState*)glfwGetWindowUserPointer(window);
+        glfwSetCursorPosCallback(m_WindowHandle, [](GLFWwindow *window, f64 xpos, f64 ypos) {
+            auto state = (WindowState *)glfwGetWindowUserPointer(window);
             Event e = {EventTag::MouseMoveEvent};
             e.MouseMoveEvent = {xpos, ypos};
-            state->Callback(e);
-
-        });
+            state->Callback(e); }
+        );
     }
 
     Window::~Window()
@@ -85,10 +83,11 @@ namespace Wigner
     {
         glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         glfwSwapBuffers(m_WindowHandle);
     }
 
-    void Window::SetEventCallback(std::function<bool(Event)> callback)
+    void Window::SetEventCallback(std::function<bool(Event &)> callback)
     {
         m_WindowState.Callback = callback;
     }

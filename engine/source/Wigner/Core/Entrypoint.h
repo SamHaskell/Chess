@@ -5,10 +5,14 @@
 
 extern Wigner::Application *Wigner::CreateApplication();
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     auto app = Wigner::CreateApplication();
-    if (!app->Run()) {
-        // Do whatever you want buddy
+    if (!app->Run())
+    {
+        // Do whatever you want
+        return EXIT_FAILURE;
     }
     delete app;
+    return EXIT_SUCCESS;
 }
