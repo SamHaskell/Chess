@@ -23,7 +23,7 @@ namespace Wigner {
 
     std::string WindowCloseEvent::ToString() {
         std::stringstream ss;
-        ss << "WindowCloseEvent: Request to close window recieved";
+        ss << "WindowCloseEvent: Request to close window received";
         return ss.str();
     }
 }
