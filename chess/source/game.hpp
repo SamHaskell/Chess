@@ -8,10 +8,10 @@ namespace Chess {
         public:
             Game() {};
             ~Game() override {};
-            virtual void Update() override {};
-            virtual void Render() override {};
+            virtual void Update(f64 dt) override;
+            virtual void Render() override;
             virtual bool OnEvent(Wigner::Event &e) override;
-            virtual void OnEnable() override {};
-            virtual void OnDisable() override {};
+            virtual void OnEnable() override;
+            virtual void OnDisable() override;
     };
 }

@@ -8,9 +8,9 @@ namespace Wigner
     {
     public:
         virtual ~Layer() {};
-        virtual void Update() {};
+        virtual void Update(f64 dt) {};
         virtual void Render() {};
-        virtual bool OnEvent(Event &e) { LOG_WARN("AAAAAAAA"); };
+        virtual bool OnEvent(Event &e) { return true; };
         virtual void OnEnable() {};
         virtual void OnDisable() {};
     private:

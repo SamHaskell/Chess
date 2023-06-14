@@ -1,4 +1,5 @@
 #include "Wigner/Core/Application.hpp"
+#include "Wigner/Graphics/Renderer.hpp"
 
 namespace Wigner
 {
@@ -15,14 +16,20 @@ namespace Wigner
 
     bool Application::Run()
     {
+        renderer_init();
         while (m_Running)
         {
-            m_Window->Update();
+            f64 dt = 0.013333; // TEMPORARY UNTIL WE IMPLEMENT DELTATIME
+            m_Window->Update(dt);
+            m_Layer->Update(dt);
+            m_Layer->Render();
         }
+        renderer_shutdown();
         return true;
     }
 
-    void Application::SetLayer(std::unique_ptr<Layer> layer) {
+    void Application::SetLayer(std::unique_ptr<Layer> layer)
+    {
         m_Layer = std::move(layer);
     }
 
@@ -30,14 +37,15 @@ namespace Wigner
     {
         switch (e.Tag)
         {
-        case EventTag::KeyEvent:
-            LOG_INFO(e.KeyEvent.ToString().c_str());
-            break;
         case EventTag::WindowCloseEvent:
             m_Running = false;
             break;
+        default:
+            break;
         }
+
         m_Layer->OnEvent(e);
+
         return true;
     }
 }

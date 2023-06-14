@@ -20,6 +20,7 @@ namespace Wigner
 
         m_WindowHandle = glfwCreateWindow(1080, 720, "Application", nullptr, nullptr);
         glfwMakeContextCurrent(m_WindowHandle);
+        glfwSwapInterval(1);
 
         gladLoadGL();
         glClearColor(0.1, 0.1, 0.1, 1.0);
@@ -79,7 +80,7 @@ namespace Wigner
         glfwTerminate();
     }
 
-    void Window::Update()
+    void Window::Update(f64 dt)
     {
         glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

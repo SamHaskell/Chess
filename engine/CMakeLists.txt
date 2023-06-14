@@ -32,6 +32,7 @@ set(
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Base/Defines.hpp
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Base/Asserts.hpp
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Base/Logging.hpp
+    ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Base/Types.hpp
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Base/Base.hpp
 
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Core/Entrypoint.h
@@ -40,6 +41,10 @@ set(
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Core/Layer.hpp
 
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Events/Events.hpp
+
+    ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Graphics/RenderTypes.hpp
+    ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Graphics/Renderer.hpp
+    ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Graphics/Texture2D.hpp
 )
 
 set(
@@ -51,6 +56,9 @@ set(
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Core/Window.cpp
 
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Events/Events.cpp
+
+    ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Graphics/Renderer.cpp
+    ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Graphics/Texture2D.cpp
 )
 
 add_library(

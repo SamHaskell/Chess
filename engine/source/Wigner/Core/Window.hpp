@@ -26,7 +26,7 @@ namespace Wigner
         Window &operator=(const Window &) = delete;
         ~Window();
 
-        void Update();
+        void Update(f64 dt);
         void SetEventCallback(std::function<bool(Event &)> callback);
 
     private:
