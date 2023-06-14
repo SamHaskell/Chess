@@ -45,6 +45,7 @@ set(
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Graphics/RenderTypes.hpp
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Graphics/Renderer.hpp
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Graphics/Texture2D.hpp
+    ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Graphics/Shader.hpp
 )
 
 set(
@@ -59,6 +60,7 @@ set(
 
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Graphics/Renderer.cpp
     ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Graphics/Texture2D.cpp
+    ${PROJECT_SOURCE_DIR}/source/${PROJECT_NAME}/Graphics/Shader.cpp
 )
 
 add_library(

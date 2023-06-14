@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Wigner/Base/Base.hpp"
 #include <string>
 
 namespace Wigner

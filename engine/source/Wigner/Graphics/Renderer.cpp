@@ -1,11 +1,11 @@
 #include "Wigner/Graphics/Renderer.hpp"
 
 namespace Wigner {
-    static Vertex2D quad_vertices[4] = {
-        {{-0.5, -0.5}, {0.0, 0.0}},
-        {{-0.5,  0.5}, {0.0, 1.0}},
-        {{ 0.5,  0.5}, {1.0, 1.0}},
-        {{ 0.5, -0.5}, {1.0, 0.0}},
+    static glm::vec4 quad_vertices[4] = {
+        {-0.5, -0.5, 0.0, 1.0},
+        {-0.5,  0.5, 0.0, 1.0},
+        { 0.5,  0.5, 0.0, 1.0},
+        { 0.5, -0.5, 0.0, 1.0}
     };
 
     static u32 quad_indices[6] = {
