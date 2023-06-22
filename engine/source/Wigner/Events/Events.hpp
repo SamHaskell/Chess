@@ -12,6 +12,7 @@ namespace Wigner
         MouseButtonEvent,
         MouseMoveEvent,
         WindowCloseEvent,
+        WindowSizeEvent,
     };
 
     enum KeyAction
@@ -64,6 +65,13 @@ namespace Wigner
         std::string ToString();
     };
 
+    struct WindowSizeEvent
+    {
+        i32 Width;
+        i32 Height;
+        std::string ToString();
+    };
+
     struct Event
     {
         EventTag Tag;
@@ -73,6 +81,7 @@ namespace Wigner
             MouseButtonEvent MouseButtonEvent;
             MouseMoveEvent MouseMoveEvent;
             WindowCloseEvent WindowCloseEvent;
+            WindowSizeEvent WindowSizeEvent;
         };
     };
 }

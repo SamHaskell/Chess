@@ -70,4 +70,9 @@ namespace Wigner
     Shader::~Shader()
     {
     }
+
+    void Shader::SetUniformMat4(const std::string& name, const glm::mat4& value) {
+        i32 loc = glGetUniformLocation(m_ShaderID, name.c_str());
+        glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
+    }
 }

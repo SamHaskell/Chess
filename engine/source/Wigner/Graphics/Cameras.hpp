@@ -6,13 +6,11 @@
 namespace Wigner {
     class OrthographicCamera {
         public:
-            OrthographicCamera(glm::vec3 position, glm::vec3 target, glm::vec3 up, f32 width, f32 height);
-            OrthographicCamera(glm::vec3 position, glm::vec3 target, f32 width, f32 height);
+            OrthographicCamera(glm::vec3 position, glm::vec3 target, f32 width, f32 height, glm::vec3 up = {0.0f, 1.0f, 0.0f});
             ~OrthographicCamera();
-            inline glm::mat4 ViewProjectionMatrix() { return m_Projection * m_View; }
+            glm::mat4 TransformMatrix;
+            glm::mat4 ViewMatrix;
+            glm::mat4 ProjectionMatrix;
         private:
-            glm::mat4 m_Transform;
-            glm::mat4 m_View;
-            glm::mat4 m_Projection;
     };
 }

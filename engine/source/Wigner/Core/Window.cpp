@@ -4,7 +4,7 @@ namespace Wigner
 {
     Window::Window()
     {
-        m_WindowState.Width = 1080;
+        m_WindowState.Width = 1280;
         m_WindowState.Height = 720;
         m_WindowState.Title = "Application";
 
@@ -18,12 +18,12 @@ namespace Wigner
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 #endif
 
-        m_WindowHandle = glfwCreateWindow(1080, 720, "Application", nullptr, nullptr);
+        m_WindowHandle = glfwCreateWindow(1280, 720, "Application", nullptr, nullptr);
         glfwMakeContextCurrent(m_WindowHandle);
         glfwSwapInterval(1);
 
         gladLoadGL();
-        glClearColor(0.1, 0.1, 0.1, 1.0);
+        glClearColor(0.2, 0.2, 0.4, 1.0);
 
         glfwSetWindowUserPointer(m_WindowHandle, &m_WindowState);
 
@@ -35,7 +35,8 @@ namespace Wigner
                 glfwSetWindowShouldClose(window, GLFW_FALSE);
             } });
 
-        glfwSetKeyCallback(m_WindowHandle, [](GLFWwindow *window, i32 key, i32 scancode, i32 action, i32 mods) {
+        glfwSetKeyCallback(m_WindowHandle, [](GLFWwindow *window, i32 key, i32 scancode, i32 action, i32 mods)
+                           {
             auto state = (WindowState*)glfwGetWindowUserPointer(window);
             Event e = {EventTag::KeyEvent};
             switch (action) {
@@ -49,10 +50,10 @@ namespace Wigner
                     e.KeyEvent = {key, KeyAction::KEY_REPEAT};
                     break;
             }
-            state->Callback(e); }
-        );
+            state->Callback(e); });
 
-        glfwSetMouseButtonCallback(m_WindowHandle, [](GLFWwindow *window, i32 button, i32 action, i32 mods) {
+        glfwSetMouseButtonCallback(m_WindowHandle, [](GLFWwindow *window, i32 button, i32 action, i32 mods)
+                                   {
             auto state = (WindowState*)glfwGetWindowUserPointer(window);
             Event e = {EventTag::MouseButtonEvent};
             switch (action) {
@@ -63,15 +64,22 @@ namespace Wigner
                     e.MouseButtonEvent = {button, MouseButtonAction::MOUSEBUTTON_RELEASE};
                 break;
             }
-            state->Callback(e); }
-        );
+            state->Callback(e); });
 
-        glfwSetCursorPosCallback(m_WindowHandle, [](GLFWwindow *window, f64 xpos, f64 ypos) {
+        glfwSetCursorPosCallback(m_WindowHandle, [](GLFWwindow *window, f64 xpos, f64 ypos)
+                                 {
             auto state = (WindowState *)glfwGetWindowUserPointer(window);
             Event e = {EventTag::MouseMoveEvent};
             e.MouseMoveEvent = {xpos, ypos};
-            state->Callback(e); }
-        );
+            state->Callback(e); });
+
+        glfwSetFramebufferSizeCallback(m_WindowHandle, [](GLFWwindow *window, i32 width, i32 height)
+                                  {
+            auto state = (WindowState *)glfwGetWindowUserPointer(window);
+            Event e = {EventTag::WindowSizeEvent};
+            glViewport(0, 0, width, height);
+            e.WindowSizeEvent = {width, height};
+            state->Callback(e); });
     }
 
     Window::~Window()

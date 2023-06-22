@@ -2,16 +2,11 @@
 
 namespace Wigner
 {
-    OrthographicCamera::OrthographicCamera(glm::vec3 position, glm::vec3 target, glm::vec3 up, f32 width, f32 height)
+    OrthographicCamera::OrthographicCamera(glm::vec3 position, glm::vec3 target, f32 width, f32 height, glm::vec3 up)
     {
-        m_Transform = glm::mat4(1.0f); // TODO: FIX THIS
-        m_View = glm::lookAt(position, target, up);
-        m_Projection = glm::ortho(-width/2.0, width/2.0, -height/2.0, height/2.0);
-    }
-
-    OrthographicCamera::OrthographicCamera(glm::vec3 position, glm::vec3 target, f32 width, f32 height)
-    {
-        OrthographicCamera(position, target, {0.0f, 1.0f, 0.0f}, width, height);
+        TransformMatrix = glm::mat4(1.0f); // TODO: FIX THIS
+        ViewMatrix = glm::lookAt(position, target, up);
+        ProjectionMatrix = glm::ortho(0.0f, (f32)width, 0.0f, (f32)height, 0.0f, 1000.0f);
     }
 
     OrthographicCamera::~OrthographicCamera()

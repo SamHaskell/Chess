@@ -26,4 +26,10 @@ namespace Wigner {
         ss << "WindowCloseEvent: Request to close window received";
         return ss.str();
     }
+
+    std::string WindowSizeEvent::ToString() {
+        std::stringstream ss;
+        ss << "WindowSizeEvent: Window resized to (" << Width << "," << Height << ")";
+        return ss.str();
+    }
 }

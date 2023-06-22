@@ -3,7 +3,7 @@
 namespace Chess
 {
     Game::Game()
-     : m_MainCamera({0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, 16, 16) // Hard-coded until I figure out how I want viewport stuff to work
+     : m_MainCamera({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 0.0f}, 1280.0f, 720.0f) // Hard-coded until I figure out how I want viewport stuff to work
     {
         Wigner::renderer_init();
     }
@@ -14,13 +14,13 @@ namespace Chess
 
     void Game::Update(f64 dt)
     {
-
     }
 
     void Game::Render()
     {
+        Wigner::Color panel_color = {0.1f, 0.1f, 0.1f, 1.0f}; 
         auto scene = Wigner::scene_begin(m_MainCamera);
-        Wigner::draw_quad(scene, 0.0f, 0.0f, 10.0f, 10.0f, {1.0f, 0.0f, 0.0f, 1.0f});
+        Wigner::draw_quad(scene, 50.0f, 50.0f, 1180.0f, 620.0f, panel_color);
     }
 
     bool Game::OnEvent(Wigner::Event &e)
