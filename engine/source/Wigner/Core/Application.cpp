@@ -16,7 +16,6 @@ namespace Wigner
 
     bool Application::Run()
     {
-        renderer_init();
         while (m_Running)
         {
             f64 dt = 0.013333; // TEMPORARY UNTIL WE IMPLEMENT DELTATIME
@@ -24,7 +23,6 @@ namespace Wigner
             m_Layer->Update(dt);
             m_Layer->Render();
         }
-        renderer_shutdown();
         return true;
     }
 

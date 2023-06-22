@@ -5,9 +5,11 @@
 namespace Wigner {
     class Shader {
         public:
-            Shader();
+            static std::shared_ptr<Shader> Create(std::string vert, std::string frag);
+
+            Shader(std::string vert, std::string frag);
             ~Shader();
         private:
-
+            u32 m_ShaderID;
     };
 }

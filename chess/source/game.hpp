@@ -6,12 +6,15 @@
 namespace Chess {
     class Game : public Wigner::Layer {
         public:
-            Game() {};
-            ~Game() override {};
-            virtual void Update(f64 dt) override;
-            virtual void Render() override;
-            virtual bool OnEvent(Wigner::Event &e) override;
-            virtual void OnEnable() override;
-            virtual void OnDisable() override;
+            Game();
+            ~Game() override;
+            void Update(f64 dt) override;
+            void Render() override;
+            bool OnEvent(Wigner::Event &e) override;
+            void OnEnable() override;
+            void OnDisable() override;
+
+        private:
+            Wigner::OrthographicCamera m_MainCamera;
     };
 }
