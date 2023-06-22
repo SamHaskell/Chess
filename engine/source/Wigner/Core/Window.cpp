@@ -82,10 +82,10 @@ namespace Wigner
 
     void Window::Update(f64 dt)
     {
+        glfwSwapBuffers(m_WindowHandle);
+
         glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glfwSwapBuffers(m_WindowHandle);
     }
 
     void Window::SetEventCallback(std::function<bool(Event &)> callback)

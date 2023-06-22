@@ -1,7 +1,5 @@
 #include "Wigner/Graphics/Shader.hpp"
 
-#include "glad/glad.h"
-
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -37,9 +35,23 @@ namespace Wigner
         glShaderSource(v, 1, &vert_shader_code, NULL);
         glCompileShader(v);
 
+        int  success;
+        char infoLog[512];
+        glGetShaderiv(v, GL_COMPILE_STATUS, &success);
+        if(!success) {
+            glGetShaderInfoLog(v, 512, NULL, infoLog);
+            LOG_ERROR("Shader Compilation Error: %s", infoLog);
+        }
+
         f = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(f, 1, &frag_shader_code, NULL);
         glCompileShader(f);
+
+        glGetShaderiv(f, GL_COMPILE_STATUS, &success);
+        if(!success) {
+            glGetShaderInfoLog(f, 512, NULL, infoLog);
+            LOG_ERROR("Shader Compilation Error: %s", infoLog);
+        }
 
         m_ShaderID = glCreateProgram();
         glAttachShader(m_ShaderID, v);

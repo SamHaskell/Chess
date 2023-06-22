@@ -2,6 +2,8 @@
 
 #include "Wigner/Base/Base.hpp"
 
+#include "glad/glad.h"
+
 namespace Wigner {
     class Shader {
         public:
@@ -9,6 +11,8 @@ namespace Wigner {
 
             Shader(std::string vert, std::string frag);
             ~Shader();
+
+            inline void Bind() { glUseProgram(m_ShaderID); }
         private:
             u32 m_ShaderID;
     };

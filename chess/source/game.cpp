@@ -20,7 +20,7 @@ namespace Chess
     void Game::Render()
     {
         auto scene = Wigner::scene_begin(m_MainCamera);
-        Wigner::draw_quad(scene, 0.0f, 0.0f, 1.0f, 1.0f, {1.0f, 0.0f, 0.0f, 1.0f});
+        Wigner::draw_quad(scene, 0.0f, 0.0f, 10.0f, 10.0f, {1.0f, 0.0f, 0.0f, 1.0f});
     }
 
     bool Game::OnEvent(Wigner::Event &e)
