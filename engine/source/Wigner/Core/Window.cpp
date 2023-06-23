@@ -75,8 +75,15 @@ namespace Wigner
         glfwSetFramebufferSizeCallback(m_WindowHandle, [](GLFWwindow *window, i32 width, i32 height)
                                   {
             auto state = (WindowState *)glfwGetWindowUserPointer(window);
-            Event e = {EventTag::WindowSizeEvent};
+            Event e = {EventTag::WindowFramebufferSizeEvent};
             glViewport(0, 0, width, height);
+            e.WindowFramebufferSizeEvent = {width, height};
+            state->Callback(e); });
+
+        glfwSetWindowSizeCallback(m_WindowHandle, [](GLFWwindow *window, i32 width, i32 height)
+                                  {
+            auto state = (WindowState *)glfwGetWindowUserPointer(window);
+            Event e = {EventTag::WindowSizeEvent};
             e.WindowSizeEvent = {width, height};
             state->Callback(e); });
     }

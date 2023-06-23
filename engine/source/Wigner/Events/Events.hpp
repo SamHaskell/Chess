@@ -12,6 +12,7 @@ namespace Wigner
         MouseButtonEvent,
         MouseMoveEvent,
         WindowCloseEvent,
+        WindowFramebufferSizeEvent,
         WindowSizeEvent,
     };
 
@@ -65,6 +66,13 @@ namespace Wigner
         std::string ToString();
     };
 
+    struct WindowFramebufferSizeEvent
+    {
+        i32 Width;
+        i32 Height;
+        std::string ToString();
+    };
+
     struct WindowSizeEvent
     {
         i32 Width;
@@ -81,6 +89,7 @@ namespace Wigner
             MouseButtonEvent MouseButtonEvent;
             MouseMoveEvent MouseMoveEvent;
             WindowCloseEvent WindowCloseEvent;
+            WindowFramebufferSizeEvent WindowFramebufferSizeEvent;
             WindowSizeEvent WindowSizeEvent;
         };
     };

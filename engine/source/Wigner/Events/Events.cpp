@@ -27,6 +27,12 @@ namespace Wigner {
         return ss.str();
     }
 
+    std::string WindowFramebufferSizeEvent::ToString() {
+        std::stringstream ss;
+        ss << "WindowSizeEvent: Window framebuffer resized to (" << Width << "," << Height << ")";
+        return ss.str();
+    }
+
     std::string WindowSizeEvent::ToString() {
         std::stringstream ss;
         ss << "WindowSizeEvent: Window resized to (" << Width << "," << Height << ")";

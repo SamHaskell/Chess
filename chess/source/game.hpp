@@ -16,5 +16,6 @@ namespace Chess {
 
         private:
             Wigner::OrthographicCamera m_MainCamera;
+            Wigner::Rect2D m_ScreenRect;
     };
 }
