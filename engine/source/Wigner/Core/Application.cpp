@@ -1,6 +1,8 @@
 #include "Wigner/Core/Application.hpp"
 #include "Wigner/Graphics/Renderer.hpp"
 
+#include <chrono>
+
 namespace Wigner
 {
     Application::Application()
@@ -16,13 +18,32 @@ namespace Wigner
 
     bool Application::Run()
     {
+        auto frame_start = std::chrono::high_resolution_clock::now();
+        auto frame_end = frame_start;
+        f64 dt = 0.0;
+
+        int count = 0;
+        f64 accum = 0.0;
+
         while (m_Running)
         {
-            f64 dt = 0.013333; // TEMPORARY UNTIL WE IMPLEMENT DELTATIME
+            count ++;
+            if (count == 60) {
+                count = 0;
+                LOG_INFO("Frame Time: %f", accum/60.0);
+                accum = 0.0;
+            }
+            frame_start = frame_end;
+
             m_Window->Update(dt);
             m_Layer->Update(dt);
             m_Layer->Render();
+            
+            frame_end = std::chrono::high_resolution_clock::now();
+            dt = std::chrono::duration<double>(frame_end - frame_start).count();
+            accum += dt;
         }
+
         return true;
     }
 

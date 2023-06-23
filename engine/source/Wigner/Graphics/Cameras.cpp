@@ -9,7 +9,13 @@ namespace Wigner
         ProjectionMatrix = glm::ortho(0.0f, (f32)width, 0.0f, (f32)height, 0.0f, 1000.0f);
     }
 
+
     OrthographicCamera::~OrthographicCamera()
     {
+    }
+
+    void OrthographicCamera::SetFrustumRect(f32 width, f32 height)
+    {
+        ProjectionMatrix = glm::ortho(0.0f, (f32)width, 0.0f, (f32)height, 0.0f, 1000.0f);
     }
 }

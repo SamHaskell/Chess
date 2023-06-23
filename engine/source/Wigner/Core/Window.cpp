@@ -20,7 +20,6 @@ namespace Wigner
 
         m_WindowHandle = glfwCreateWindow(1280, 720, "Application", nullptr, nullptr);
         glfwMakeContextCurrent(m_WindowHandle);
-        glfwSwapInterval(1);
 
         gladLoadGL();
         glClearColor(0.2, 0.2, 0.4, 1.0);
