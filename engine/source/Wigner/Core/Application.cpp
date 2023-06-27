@@ -27,10 +27,14 @@ namespace Wigner
 
         while (m_Running)
         {
+            frame_end = std::chrono::high_resolution_clock::now();
+            dt = std::chrono::duration<double>(frame_end - frame_start).count();
+            accum += dt;
+
             count ++;
             if (count == 60) {
-                count = 0;
                 LOG_INFO("Frame Time: %f", accum/60.0);
+                count = 0;
                 accum = 0.0;
             }
             frame_start = frame_end;
@@ -39,9 +43,6 @@ namespace Wigner
             m_Layer->Update(dt);
             m_Layer->Render();
             
-            frame_end = std::chrono::high_resolution_clock::now();
-            dt = std::chrono::duration<double>(frame_end - frame_start).count();
-            accum += dt;
         }
 
         return true;

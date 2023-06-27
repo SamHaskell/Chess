@@ -17,11 +17,13 @@ set(
     ${PROJECT_SOURCE_DIR}/vendor/glad/include
     ${PROJECT_SOURCE_DIR}/vendor/glfw/include
     ${PROJECT_SOURCE_DIR}/vendor/glm
+    ${PROJECT_SOURCE_DIR}/vendor/stb_image
 )
 
 set(
     VENDOR_SOURCES
     ${PROJECT_SOURCE_DIR}/vendor/glad/src/glad.c
+    ${PROJECT_SOURCE_DIR}/vendor/stb_image/stb_image.cpp
 )
 
 ################### LIBRARY ##################

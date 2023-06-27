@@ -4,7 +4,8 @@ namespace Chess
 {
     Game::Game()
         : m_MainCamera({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 0.0f}, 1280.0f, 720.0f),
-          m_ScreenRect({0.0f, 0.0f, 1280.0f, 720.0f})
+          m_ScreenRect({0.0f, 0.0f, 1280.0f, 720.0f}),
+          m_TestTexture("assets/user/textures/spyro.png")
     {
         Wigner::renderer_init();
     }

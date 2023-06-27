@@ -37,7 +37,7 @@ namespace Wigner
     void renderer_init()
     {
         is_initialized = true;
-        shader_sprite = Shader::Create("assets/shaders/UnlitSprite2D.vert", "assets/shaders/UnlitSprite2D.frag");
+        shader_sprite = Shader::Create("assets/core/shaders/UnlitSprite2D.vert", "assets/core/shaders/UnlitSprite2D.frag");
 
         glDisable(GL_CULL_FACE);
     }
@@ -106,5 +106,9 @@ namespace Wigner
 
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glDeleteBuffers(1, &vbo);
+        glDeleteBuffers(1, &ibo);
+        glDeleteVertexArrays(1, &vao);
     }
 }

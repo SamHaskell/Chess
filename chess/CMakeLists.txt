@@ -1,5 +1,5 @@
 project(
-    Chess
+    chess
     VERSION 0.1
     DESCRIPTION "Chess App"
     LANGUAGES CXX
