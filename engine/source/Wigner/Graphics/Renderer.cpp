@@ -87,16 +87,13 @@ namespace Wigner
         glEnableVertexAttribArray(2);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
 
         texture.Bind();
 
-        glBindVertexArray(0);
-
         shader_sprite->Bind();
-
         shader_sprite->SetUniformMat4("u_View", glm::mat4(1.0f));
         shader_sprite->SetUniformMat4("u_Projection", glm::mat4(1.0f));
-
         shader_sprite->SetUniformMat4("u_View", scene.ViewMatrix);
         shader_sprite->SetUniformMat4("u_Projection", scene.ProjectionMatrix);
 
@@ -106,6 +103,8 @@ namespace Wigner
         glDeleteBuffers(1, &vbo);
         glDeleteBuffers(1, &ibo);
         glDeleteVertexArrays(1, &vao);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     void draw_quad(SceneData scene, Rect2D target_rect, Color color)
