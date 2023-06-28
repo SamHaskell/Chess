@@ -25,6 +25,7 @@ namespace Chess
 
         Wigner::Color black = {0.1f, 0.1f, 0.1f, 1.0f};
         Wigner::Color white = {0.9f, 0.9f, 0.9f, 1.0f};
+        Wigner::Color test = {1.0f, 1.0f, 1.0f, 1.0f};
         Wigner::Point2D center = rect_get_center(m_ScreenRect);
         
         for (i32 j = 0; j < 8; j++)
@@ -35,15 +36,14 @@ namespace Chess
                 Wigner::draw_quad(scene, center.X - 320.0f + 80.0f * i, center.Y - 320.0f + 80.0f * j, 80.0f, 80.0f, col);
             }
         }
+
+        Wigner::draw_textured_quad(scene, m_TestTexture, 0.0f, 0.0f, 100.0f, 100.0f, test);
     }
 
     bool Game::OnEvent(Wigner::Event &e)
     {
         switch (e.Tag)
         {
-        case Wigner::EventTag::KeyEvent:
-            LOG_INFO(e.KeyEvent.ToString().c_str());
-            break;
         case Wigner::EventTag::WindowSizeEvent:
             m_ScreenRect.Width = e.WindowSizeEvent.Width;
             m_ScreenRect.Height = e.WindowSizeEvent.Height;

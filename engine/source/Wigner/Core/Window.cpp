@@ -22,6 +22,8 @@ namespace Wigner
         glfwMakeContextCurrent(m_WindowHandle);
 
         gladLoadGL();
+        glEnable(GL_BLEND); 
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glClearColor(0.2, 0.2, 0.4, 1.0);
 
         glfwSetWindowUserPointer(m_WindowHandle, &m_WindowState);

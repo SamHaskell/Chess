@@ -12,6 +12,5 @@ uniform mat4 u_View;
 
 void main() {
     gl_Position = u_Projection * u_View * i_Position;
-    v_TexCoord = i_TexCoord;
     v_Color = i_Color;
 }

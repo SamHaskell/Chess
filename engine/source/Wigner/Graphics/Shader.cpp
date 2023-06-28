@@ -75,4 +75,9 @@ namespace Wigner
         i32 loc = glGetUniformLocation(m_ShaderID, name.c_str());
         glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
     }
+
+    void Shader::SetUniformInt(const std::string& name, i32 value) {
+        i32 loc = glGetUniformLocation(m_ShaderID, name.c_str());
+        glUniform1i(loc, value);
+    }
 }
