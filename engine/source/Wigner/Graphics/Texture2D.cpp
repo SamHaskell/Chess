@@ -32,6 +32,11 @@ namespace Wigner
         stbi_image_free(data);
     }
 
+    std::shared_ptr<Texture2D> Texture2D::Create(const std::string& path)
+    {
+        return std::make_shared<Texture2D>(path);
+    }
+
     Texture2D::~Texture2D()
     {
         glDeleteTextures(1, &m_TextureID);

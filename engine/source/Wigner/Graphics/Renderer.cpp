@@ -48,12 +48,12 @@ namespace Wigner
         is_initialized = false;
     }
 
-    void draw_textured_quad(SceneData scene, const Texture2D& texture, Rect2D target_rect, Color color)
+    void draw_textured_quad(SceneData scene, const std::shared_ptr<Texture2D> texture, Rect2D target_rect, Color color)
     {
         draw_textured_quad(scene, texture, target_rect.X, target_rect.Y, target_rect.Width, target_rect.Height, color);
     }
 
-    void draw_textured_quad(SceneData scene, const Texture2D& texture, f32 x, f32 y, f32 width, f32 height, Color color)
+    void draw_textured_quad(SceneData scene, const std::shared_ptr<Texture2D> texture, f32 x, f32 y, f32 width, f32 height, Color color)
     {
         Vertex2D vertices[4];
         glm::mat4 translation = glm::translate(glm::mat4(1.0), {x, y, 0.0f});
@@ -89,7 +89,7 @@ namespace Wigner
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
 
-        texture.Bind();
+        texture->Bind();
 
         shader_sprite->Bind();
         shader_sprite->SetUniformMat4("u_View", glm::mat4(1.0f));
