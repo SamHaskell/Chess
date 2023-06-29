@@ -43,8 +43,10 @@ namespace Chess
         state->SelectedCell = {UNSELECTED_INDEX, UNSELECTED_INDEX};
         state->CurrentTeam = TEAM_WHITE;
 
-        for (i32 i = 0; i < 8; i++) {
-            for (i32 j = 0; j < 8; j++) {
+        for (i32 i = 0; i < 8; i++)
+        {
+            for (i32 j = 0; j < 8; j++)
+            {
                 state->Pieces[i][j] = {i, j, PIECE_NONE, TEAM_NONE};
             }
         }
@@ -88,50 +90,94 @@ namespace Chess
             }
         }
 
-        if (state->SelectedCell.Col == UNSELECTED_INDEX || state->SelectedCell.Row == UNSELECTED_INDEX) {
-
-        } else {
+        if (state->SelectedCell.Col == UNSELECTED_INDEX || state->SelectedCell.Row == UNSELECTED_INDEX)
+        {
+        }
+        else
+        {
             Wigner::draw_quad(
                 scene,
                 state->BoardRect.X + dx * state->SelectedCell.Col,
                 state->BoardRect.Y + dy * state->SelectedCell.Row,
                 dx,
                 dy,
-                COLOR_RED_TINT
-            );
+                COLOR_RED_TINT);
 
-            for (auto coord : state->HighlightedCells) {
+            for (auto coord : state->HighlightedCells)
+            {
                 Wigner::draw_quad(
                     scene,
                     state->BoardRect.X + dx * coord.Col,
                     state->BoardRect.Y + dy * coord.Row,
                     dx,
                     dy,
-                    COLOR_BLUE_TINT
-                );
+                    COLOR_BLUE_TINT);
             }
         }
 
-        for (i32 i = 0; i < 8; i++) {
-            for (i32 j = 0; j < 8; j++) {
+        for (i32 i = 0; i < 8; i++)
+        {
+            for (i32 j = 0; j < 8; j++)
+            {
                 auto piece = state->Pieces[i][j];
-                if (piece.Type != PIECE_NONE) {
+                if (piece.Type != PIECE_NONE)
+                {
                     f32 w, h, xoff, yoff;
                     h = (piece.Type == PIECE_PAWN) ? dy * 0.7f : dy * 0.8f;
-                    w = h * state->PieceTextures[piece.Type + PIECE_NONE*piece.Team]->GetAspectRatio();
-                    xoff = (dx-w)/2.0f + (0.02*w);
-                    yoff = dy*0.1f;
+                    w = h * state->PieceTextures[piece.Type + PIECE_NONE * piece.Team]->GetAspectRatio();
+                    xoff = (dx - w) / 2.0f + (0.02 * w);
+                    yoff = dy * 0.1f;
 
                     Wigner::draw_textured_quad(
-                        scene, 
-                        state->PieceTextures[piece.Type + PIECE_NONE*piece.Team], 
-                        state->BoardRect.X + dx * piece.Col + xoff, 
-                        state->BoardRect.Y + dy * piece.Row + yoff, 
-                        w, 
-                        h, 
+                        scene,
+                        state->PieceTextures[piece.Type + PIECE_NONE * piece.Team],
+                        state->BoardRect.X + dx * piece.Col + xoff,
+                        state->BoardRect.Y + dy * piece.Row + yoff,
+                        w,
+                        h,
                         COLOR_WHITE);
                 }
             }
         }
+    }
+
+    void on_cell_select(const std::unique_ptr<GameState> &state, Coord cell)
+    {
+        state->SelectedCell = cell;
+        state->HighlightedCells.clear();
+        
+        auto selected_piece = state->Pieces[cell.Col][cell.Row];
+        
+        i32 y_dir = (selected_piece.Team == TEAM_WHITE) ? 1 : -1;
+        switch (selected_piece.Type) {
+            case PIECE_NONE:
+                LOG_WARN("Selected piece is of type NONE");
+                break;
+            case PIECE_PAWN:
+                if (state->Pieces[cell.Col][cell.Row + y_dir].Type == PIECE_NONE) {
+                    state->HighlightedCells.push_back({cell.Row + y_dir, cell.Col});
+                    if (state->Pieces[cell.Col][cell.Row + y_dir * 2].Type == PIECE_NONE) {
+                        state->HighlightedCells.push_back({cell.Row + y_dir * 2, cell.Col});
+                    }
+                }
+                break;
+            case PIECE_ROOK:
+                break;
+            case PIECE_BISHOP:
+                break;
+            case PIECE_KNIGHT:
+                break;
+            case PIECE_QUEEN:
+                break;
+            case PIECE_KING:
+                break;
+        }
+
+    }
+
+    void on_cell_deselect(const std::unique_ptr<GameState> &state)
+    {
+        state->SelectedCell = {UNSELECTED_INDEX, UNSELECTED_INDEX};
+        state->HighlightedCells.clear();
     }
 }

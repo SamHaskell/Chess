@@ -42,20 +42,23 @@ namespace Chess
             if (e.MouseButtonEvent.ButtonCode == GLFW_MOUSE_BUTTON_LEFT && e.MouseButtonEvent.Action == GLFW_PRESS) {
                 i32 y = (i32)(8.0f*(m_MousePosition.Y - m_GameState->BoardRect.Y)/m_GameState->BoardRect.Height);
                 i32 x = (i32)(8.0f*(m_MousePosition.X - m_GameState->BoardRect.X)/m_GameState->BoardRect.Width);
-                Coord temp = {x, y};
+                Coord temp = {y, x};
                 if (!point_in_rect(m_MousePosition, m_GameState->BoardRect)) {
-                    m_GameState->SelectedCell = {UNSELECTED_INDEX, UNSELECTED_INDEX};
-                    m_GameState->HighlightedCells.clear();
+                    on_cell_deselect(m_GameState);
                 } else if (temp.Col == m_GameState->SelectedCell.Col && temp.Row == m_GameState->SelectedCell.Row) {
-                    m_GameState->SelectedCell = {UNSELECTED_INDEX, UNSELECTED_INDEX};
-                    m_GameState->HighlightedCells.clear();
+                    on_cell_deselect(m_GameState);
                 } else {
                     if (m_GameState->Pieces[x][y].Team == m_GameState->CurrentTeam) {
-                        m_GameState->SelectedCell = {y, x};
+                        on_cell_select(m_GameState, {y, x});
                     } else {
-                        m_GameState->SelectedCell = {UNSELECTED_INDEX, UNSELECTED_INDEX};
+                        on_cell_deselect(m_GameState);
                     }
                 }
+            }
+        case Wigner::EventTag::KeyEvent:
+            if (e.KeyEvent.KeyCode == GLFW_KEY_SPACE && e.KeyEvent.Action == GLFW_PRESS) {
+                m_GameState->CurrentTeam = (Team)(((int)m_GameState->CurrentTeam + 1) % 2);
+                LOG_INFO("TEAM SWITCHED!");
             }
         default:
             break;
