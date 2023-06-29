@@ -6,6 +6,9 @@ namespace Chess
     static Wigner::Color COLOR_OFFWHITE = {0.9f, 0.9f, 0.9f, 1.0f};
     static Wigner::Color COLOR_WHITE = {1.0f, 1.0f, 1.0f, 1.0f};
     static Wigner::Color COLOR_BLACK = {0.0f, 0.0f, 0.0f, 1.0f};
+    static Wigner::Color COLOR_RED_TINT = {1.0f, 0.0f, 0.0f, 0.6f};
+
+    #define UNSELECTED_INDEX -1
 
     std::unique_ptr<GameState> gamestate_create()
     {
@@ -38,6 +41,8 @@ namespace Chess
 
     void board_init(const std::unique_ptr<GameState> &state)
     {
+        state->SelectedCell = {UNSELECTED_INDEX, UNSELECTED_INDEX};
+
         for (i32 i = 0; i < 8; i++) {
             for (i32 j = 0; j < 8; j++) {
                 state->Pieces[i][j] = {i, j, PIECE_NONE, TEAM_NONE};
@@ -81,6 +86,19 @@ namespace Chess
                 Wigner::Color col = ((i + 7 * j) % 2 == 0) ? COLOR_DARKGREEN : COLOR_OFFWHITE;
                 Wigner::draw_quad(scene, state->BoardRect.X + dx * i, state->BoardRect.Y + dy * j, dx, dy, col);
             }
+        }
+
+        if (state->SelectedCell.Col == UNSELECTED_INDEX || state->SelectedCell.Row == UNSELECTED_INDEX) {
+
+        } else {
+            Wigner::draw_quad(
+                scene,
+                state->BoardRect.X + dx * state->SelectedCell.Col,
+                state->BoardRect.Y + dy * state->SelectedCell.Row,
+                dx,
+                dy,
+                COLOR_RED_TINT
+            );
         }
 
         for (i32 i = 0; i < 8; i++) {

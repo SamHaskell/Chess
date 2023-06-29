@@ -36,6 +36,14 @@ namespace Chess
             m_ScreenRect.Width = e.WindowSizeEvent.Width;
             m_ScreenRect.Height = e.WindowSizeEvent.Height;
             m_MainCamera.SetFrustumRect(e.WindowSizeEvent.Width, e.WindowSizeEvent.Height);
+        case Wigner::EventTag::MouseMoveEvent:
+            m_MousePosition = {(f32)e.MouseMoveEvent.X, m_ScreenRect.Height - (f32)e.MouseMoveEvent.Y};
+        case Wigner::EventTag::MouseButtonEvent:
+            if (e.MouseButtonEvent.ButtonCode == GLFW_MOUSE_BUTTON_LEFT && e.MouseButtonEvent.Action == GLFW_PRESS) {
+                i32 x = (i32)(8.0f*(m_MousePosition.Y - m_GameState->BoardRect.Y)/m_GameState->BoardRect.Height);
+                i32 y = (i32)(8.0f*(m_MousePosition.X - m_GameState->BoardRect.X)/m_GameState->BoardRect.Width);
+                m_GameState->SelectedCell = {x, y};
+            }
         default:
             break;
         }

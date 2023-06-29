@@ -22,6 +22,11 @@ namespace Chess {
         TEAM_NONE
     };
 
+    struct Coord {
+        i32 Row;
+        i32 Col;
+    };
+
     struct GamePiece {
         i32 Row;
         i32 Col;
@@ -33,7 +38,8 @@ namespace Chess {
         Wigner::Rect2D BoardRect;
         std::array<std::shared_ptr<Wigner::Texture2D>, 12> PieceTextures;
         GamePiece Pieces[8][8];
-        
+        Coord SelectedCell;
+        std::vector<Coord> ValidMoves;
     };
 
     std::unique_ptr<GameState> gamestate_create();
