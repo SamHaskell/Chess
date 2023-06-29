@@ -52,4 +52,5 @@ namespace Chess {
     void board_render(const std::unique_ptr<GameState>& state, Wigner::SceneData scene);
     void on_cell_select(const std::unique_ptr<GameState>& state, Coord cell);
     void on_cell_deselect(const std::unique_ptr<GameState>& state);
+    bool check_valid_move(const std::unique_ptr<GameState>& state, Coord cell);
 }

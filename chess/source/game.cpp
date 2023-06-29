@@ -48,16 +48,13 @@ namespace Chess
                 } else if (temp.Col == m_GameState->SelectedCell.Col && temp.Row == m_GameState->SelectedCell.Row) {
                     on_cell_deselect(m_GameState);
                 } else {
-                    if (m_GameState->Pieces[x][y].Team == m_GameState->CurrentTeam) {
-                        on_cell_select(m_GameState, {y, x});
-                    } else {
-                        on_cell_deselect(m_GameState);
-                    }
+                    on_cell_select(m_GameState, {y, x});
                 }
             }
         case Wigner::EventTag::KeyEvent:
             if (e.KeyEvent.KeyCode == GLFW_KEY_SPACE && e.KeyEvent.Action == GLFW_PRESS) {
-                m_GameState->CurrentTeam = (Team)(((int)m_GameState->CurrentTeam + 1) % 2);
+                on_cell_deselect(m_GameState);
+                m_GameState->CurrentTeam = (Team)(((i32)m_GameState->CurrentTeam + 1) % 2);
                 LOG_INFO("TEAM SWITCHED!");
             }
         default:

@@ -6,8 +6,8 @@ namespace Chess
     static Wigner::Color COLOR_OFFWHITE = {0.9f, 0.9f, 0.9f, 1.0f};
     static Wigner::Color COLOR_WHITE = {1.0f, 1.0f, 1.0f, 1.0f};
     static Wigner::Color COLOR_BLACK = {0.0f, 0.0f, 0.0f, 1.0f};
-    static Wigner::Color COLOR_RED_TINT = {1.0f, 0.2f, 0.2f, 0.5f};
-    static Wigner::Color COLOR_BLUE_TINT = {0.2f, 0.2f, 1.0f, 0.5f};
+    static Wigner::Color COLOR_RED_TINT = {1.0f, 0.6f, 0.1f, 0.5f};
+    static Wigner::Color COLOR_BLUE_TINT = {0.2f, 0.2f, 1.0f, 0.3f};
 
     std::unique_ptr<GameState> gamestate_create()
     {
@@ -56,6 +56,8 @@ namespace Chess
             state->Pieces[i][1] = {1, i, PIECE_PAWN, TEAM_WHITE};
             state->Pieces[i][6] = {6, i, PIECE_PAWN, TEAM_BLACK};
         }
+
+        state->Pieces[1][2] = {2, 1, PIECE_PAWN, TEAM_BLACK};
 
         state->Pieces[0][0] = {0, 0, PIECE_ROOK, TEAM_WHITE};
         state->Pieces[1][0] = {0, 1, PIECE_KNIGHT, TEAM_WHITE};
@@ -143,21 +145,61 @@ namespace Chess
 
     void on_cell_select(const std::unique_ptr<GameState> &state, Coord cell)
     {
-        state->SelectedCell = cell;
+        // Check if player is making an existing valid move
+
+        if (check_valid_move(state, cell)) {
+            LOG_DEBUG("VALID!");
+            return;
+        }
+
+        LOG_DEBUG("SOMETHING ELSE");
+
         state->HighlightedCells.clear();
-        
         auto selected_piece = state->Pieces[cell.Col][cell.Row];
         
+        // If not a valid move, deselect if clicking on an enemy piece or empty cell
+
+        if (selected_piece.Team != state->CurrentTeam) {
+            state->SelectedCell = {UNSELECTED_INDEX, UNSELECTED_INDEX};
+            return;
+        }
+
+        //
+
+        state->SelectedCell = cell;
+        
         i32 y_dir = (selected_piece.Team == TEAM_WHITE) ? 1 : -1;
+        GamePiece target;
+
         switch (selected_piece.Type) {
             case PIECE_NONE:
                 LOG_WARN("Selected piece is of type NONE");
                 break;
             case PIECE_PAWN:
-                if (state->Pieces[cell.Col][cell.Row + y_dir].Type == PIECE_NONE) {
+                // PAWN PROMOTION
+                if ((selected_piece.Team == TEAM_WHITE && cell.Row == 7) || (selected_piece.Team == TEAM_BLACK && cell.Row == 0)) {
+                    LOG_WARN("Pawn promotion not yet implemented, pawn should not exist at this location.");
+                }
+                // BASIC FORWARD MOVES
+                target = state->Pieces[cell.Col][cell.Row + y_dir];
+                if (target.Type == PIECE_NONE) {
                     state->HighlightedCells.push_back({cell.Row + y_dir, cell.Col});
-                    if (state->Pieces[cell.Col][cell.Row + y_dir * 2].Type == PIECE_NONE) {
+                    target = state->Pieces[cell.Col][cell.Row + y_dir * 2];
+                    if (target.Type == PIECE_NONE) {
                         state->HighlightedCells.push_back({cell.Row + y_dir * 2, cell.Col});
+                    }
+                }
+                // DIAGONAL CAPTURE MOVES
+                if (cell.Col != 7) {
+                    target = state->Pieces[cell.Col + 1][cell.Row + y_dir];
+                    if (target.Type != PIECE_NONE && target.Team != selected_piece.Team) {
+                        state->HighlightedCells.push_back({cell.Row + y_dir, cell.Col + 1});
+                    }
+                }
+                if (cell.Col != 0) {
+                    target = state->Pieces[cell.Col - 1][cell.Row + y_dir];
+                    if (target.Type != PIECE_NONE && target.Team != selected_piece.Team) {
+                        state->HighlightedCells.push_back({cell.Row + y_dir, cell.Col - 1});
                     }
                 }
                 break;
@@ -179,5 +221,15 @@ namespace Chess
     {
         state->SelectedCell = {UNSELECTED_INDEX, UNSELECTED_INDEX};
         state->HighlightedCells.clear();
+    }
+
+    bool check_valid_move(const std::unique_ptr<GameState>& state, Coord cell)
+    {
+        for (Coord move : state->HighlightedCells) {
+            if (move.Col == cell.Col && move.Row == cell.Row) {
+                return true;
+            }
+        }
+        return false;
     }
 }

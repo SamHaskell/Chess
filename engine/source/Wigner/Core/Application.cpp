@@ -33,7 +33,7 @@ namespace Wigner
 
             count ++;
             if (count == 60) {
-                LOG_INFO("Frame Time: %f", accum/60.0);
+                // LOG_INFO("Frame Time: %f", accum/60.0);
                 count = 0;
                 accum = 0.0;
             }
@@ -41,8 +41,7 @@ namespace Wigner
 
             m_Window->Update(dt);
             m_Layer->Update(dt);
-            m_Layer->Render();
-            
+            m_Layer->Render(); 
         }
 
         return true;
