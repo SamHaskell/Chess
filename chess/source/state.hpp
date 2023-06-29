@@ -42,6 +42,10 @@ namespace Chess {
         Coord SelectedCell;
         std::vector<Coord> HighlightedCells;
         Team CurrentTeam;
+        bool IsBlackInCheck;
+        bool IsWhiteInCheck;
+        bool CanBlackCastle;
+        bool CanWhiteCastle;
     };
 
     std::unique_ptr<GameState> gamestate_create();

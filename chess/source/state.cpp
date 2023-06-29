@@ -161,15 +161,16 @@ namespace Chess
             if (selected_piece.Team == other_team) {
                 LOG_DEBUG("CAPTURED A PIECE");
             }
-            current_piece.FirstMove = false;
-            state->Pieces[cell.X][cell.Y] = current_piece;
-            state->Pieces[state->SelectedCell.X][state->SelectedCell.Y] = {PIECE_NONE, TEAM_NONE};
 
-            if (selected_piece.Type == PIECE_PAWN) {
-                if ((selected_piece.Team == TEAM_WHITE && state->SelectedCell.Y == 7) || (selected_piece.Team == TEAM_BLACK && state->SelectedCell.Y == 0)) {
+            if (current_piece.Type == PIECE_PAWN) {
+                if ((current_piece.Team == TEAM_WHITE && cell.Y == 7) || (current_piece.Team == TEAM_BLACK && cell.Y == 0)) {
                     LOG_WARN("Pawn promotion not yet implemented, pawn should not exist at this location.");
                 }
             }
+
+            current_piece.FirstMove = false;
+            state->Pieces[cell.X][cell.Y] = current_piece;
+            state->Pieces[state->SelectedCell.X][state->SelectedCell.Y] = {PIECE_NONE, TEAM_NONE};
             
             state->SelectedCell = {UNSELECTED_INDEX, UNSELECTED_INDEX};
             state->HighlightedCells.clear();
@@ -189,6 +190,7 @@ namespace Chess
         //
 
         state->SelectedCell = cell;
+        state->HighlightedCells.clear();
         
         i32 y_dir = (selected_piece.Team == TEAM_WHITE) ? 1 : -1;
         GamePiece target;
