@@ -40,15 +40,15 @@ namespace Chess
             m_MousePosition = {(f32)e.MouseMoveEvent.X, m_ScreenRect.Height - (f32)e.MouseMoveEvent.Y};
         case Wigner::EventTag::MouseButtonEvent:
             if (e.MouseButtonEvent.ButtonCode == GLFW_MOUSE_BUTTON_LEFT && e.MouseButtonEvent.Action == GLFW_PRESS) {
-                i32 y = (i32)(8.0f*(m_MousePosition.Y - m_GameState->BoardRect.Y)/m_GameState->BoardRect.Height);
                 i32 x = (i32)(8.0f*(m_MousePosition.X - m_GameState->BoardRect.X)/m_GameState->BoardRect.Width);
-                Coord temp = {y, x};
+                i32 y = (i32)(8.0f*(m_MousePosition.Y - m_GameState->BoardRect.Y)/m_GameState->BoardRect.Height);
+                Coord temp = {x, y};
                 if (!point_in_rect(m_MousePosition, m_GameState->BoardRect)) {
                     on_cell_deselect(m_GameState);
-                } else if (temp.Col == m_GameState->SelectedCell.Col && temp.Row == m_GameState->SelectedCell.Row) {
+                } else if (temp.X == m_GameState->SelectedCell.X && temp.Y == m_GameState->SelectedCell.Y) {
                     on_cell_deselect(m_GameState);
                 } else {
-                    on_cell_select(m_GameState, {y, x});
+                    on_cell_select(m_GameState, temp);
                 }
             }
         case Wigner::EventTag::KeyEvent:

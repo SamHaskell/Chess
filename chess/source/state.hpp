@@ -25,15 +25,14 @@ namespace Chess {
     };
 
     struct Coord {
-        i32 Row;
-        i32 Col;
+        i32 X;
+        i32 Y;
     };
 
     struct GamePiece {
-        i32 Row;
-        i32 Col;
         PieceType Type;
         Team Team;
+        bool FirstMove = true;
     };
 
     struct GameState {
