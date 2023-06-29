@@ -40,9 +40,22 @@ namespace Chess
             m_MousePosition = {(f32)e.MouseMoveEvent.X, m_ScreenRect.Height - (f32)e.MouseMoveEvent.Y};
         case Wigner::EventTag::MouseButtonEvent:
             if (e.MouseButtonEvent.ButtonCode == GLFW_MOUSE_BUTTON_LEFT && e.MouseButtonEvent.Action == GLFW_PRESS) {
-                i32 x = (i32)(8.0f*(m_MousePosition.Y - m_GameState->BoardRect.Y)/m_GameState->BoardRect.Height);
-                i32 y = (i32)(8.0f*(m_MousePosition.X - m_GameState->BoardRect.X)/m_GameState->BoardRect.Width);
-                m_GameState->SelectedCell = {x, y};
+                i32 y = (i32)(8.0f*(m_MousePosition.Y - m_GameState->BoardRect.Y)/m_GameState->BoardRect.Height);
+                i32 x = (i32)(8.0f*(m_MousePosition.X - m_GameState->BoardRect.X)/m_GameState->BoardRect.Width);
+                Coord temp = {x, y};
+                if (!point_in_rect(m_MousePosition, m_GameState->BoardRect)) {
+                    m_GameState->SelectedCell = {UNSELECTED_INDEX, UNSELECTED_INDEX};
+                    m_GameState->HighlightedCells.clear();
+                } else if (temp.Col == m_GameState->SelectedCell.Col && temp.Row == m_GameState->SelectedCell.Row) {
+                    m_GameState->SelectedCell = {UNSELECTED_INDEX, UNSELECTED_INDEX};
+                    m_GameState->HighlightedCells.clear();
+                } else {
+                    if (m_GameState->Pieces[x][y].Team == m_GameState->CurrentTeam) {
+                        m_GameState->SelectedCell = {y, x};
+                    } else {
+                        m_GameState->SelectedCell = {UNSELECTED_INDEX, UNSELECTED_INDEX};
+                    }
+                }
             }
         default:
             break;

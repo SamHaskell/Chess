@@ -6,6 +6,8 @@
 #include <vector>
 
 namespace Chess {
+    #define UNSELECTED_INDEX -1
+
     enum PieceType {
         PIECE_PAWN,
         PIECE_ROOK,
@@ -39,7 +41,8 @@ namespace Chess {
         std::array<std::shared_ptr<Wigner::Texture2D>, 12> PieceTextures;
         GamePiece Pieces[8][8];
         Coord SelectedCell;
-        std::vector<Coord> ValidMoves;
+        std::vector<Coord> HighlightedCells;
+        Team CurrentTeam;
     };
 
     std::unique_ptr<GameState> gamestate_create();
@@ -47,5 +50,4 @@ namespace Chess {
     void gamestate_update(const std::unique_ptr<GameState>& state, f64 dt);
     void board_init(const std::unique_ptr<GameState> &state);
     void board_render(const std::unique_ptr<GameState>& state, Wigner::SceneData scene);
-    void pieces_render(const std::unique_ptr<GameState>& state, Wigner::SceneData scene);
 }
