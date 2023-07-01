@@ -18,7 +18,6 @@ namespace Chess
     void Game::Update(f64 dt)
     {
         Wigner::Point2D center = rect_get_center(m_ScreenRect);
-        // gamestate_update(m_GameState, dt);
         m_Board->DrawRect = {center.X - 320.0f, center.Y - 320.0f, 640.0f, 640.0f};
     }
 
@@ -30,35 +29,40 @@ namespace Chess
 
     bool Game::OnEvent(Wigner::Event &e)
     {
-        switch (e.Tag)
-        {
-        case Wigner::EventTag::WindowSizeEvent:
-            m_ScreenRect.Width = e.WindowSizeEvent.Width;
-            m_ScreenRect.Height = e.WindowSizeEvent.Height;
-            m_MainCamera.SetFrustumRect(e.WindowSizeEvent.Width, e.WindowSizeEvent.Height);
-        case Wigner::EventTag::MouseMoveEvent:
-            m_MousePosition = {(f32)e.MouseMoveEvent.X, m_ScreenRect.Height - (f32)e.MouseMoveEvent.Y};
-        case Wigner::EventTag::MouseButtonEvent:
-            if (e.MouseButtonEvent.ButtonCode == GLFW_MOUSE_BUTTON_LEFT && e.MouseButtonEvent.Action == Wigner::MOUSEBUTTON_PRESS)
-            {
-                i32 x = (i32)(8.0f * (m_MousePosition.X - m_Board->DrawRect.X) / m_Board->DrawRect.Width);
-                i32 y = (i32)(8.0f * (m_MousePosition.Y - m_Board->DrawRect.Y) / m_Board->DrawRect.Height);
-
-                if (!point_in_rect(m_MousePosition, m_Board->DrawRect)) {
-                    m_Board->SelectedCell = BOARD_INVALID_CELL;
-                } else if (x == get_file(m_Board->SelectedCell) && y == get_rank(m_Board->SelectedCell)) {
-                    m_Board->SelectedCell = BOARD_INVALID_CELL;
-                } else {
-                    m_Board->SelectedCell = (y*8) + x;
+        switch (e.Tag) {
+            case Wigner::EventTag::WindowSizeEvent:
+                m_ScreenRect.Width = e.WindowSizeEvent.Width;
+                m_ScreenRect.Height = e.WindowSizeEvent.Height;
+                m_MainCamera.SetFrustumRect(e.WindowSizeEvent.Width, e.WindowSizeEvent.Height);
+            case Wigner::EventTag::MouseMoveEvent:
+                m_MousePosition = {(f32)e.MouseMoveEvent.X, m_ScreenRect.Height - (f32)e.MouseMoveEvent.Y};
+            case Wigner::EventTag::MouseButtonEvent:
+                if (e.MouseButtonEvent.ButtonCode == GLFW_MOUSE_BUTTON_LEFT && e.MouseButtonEvent.Action == Wigner::MOUSEBUTTON_PRESS) {
+                    i32 x = (i32)(8.0f * (m_MousePosition.X - m_Board->DrawRect.X) / m_Board->DrawRect.Width);
+                    i32 y = (i32)(8.0f * (m_MousePosition.Y - m_Board->DrawRect.Y) / m_Board->DrawRect.Height);
+                    if (!point_in_rect(m_MousePosition, m_Board->DrawRect)) {
+                        m_Board->SelectedCell = BOARD_INVALID_CELL;
+                        m_Board->HighlightedCells.clear();
+                    } else if (x == get_file(m_Board->SelectedCell) && y == get_rank(m_Board->SelectedCell)) {
+                        m_Board->SelectedCell = BOARD_INVALID_CELL;
+                        m_Board->HighlightedCells.clear();
+                    } else {
+                        m_Board->SelectedCell = (y*8) + x;
+                        m_Board->HighlightedCells.clear();
+                        for (i32 move : m_Board->LegalMoves) {
+                            if (move_get_origin(move) == m_Board->SelectedCell) {
+                                m_Board->HighlightedCells.insert(move_get_target(move));
+                            }
+                        }
+                    }
                 }
-            }
-        case Wigner::EventTag::KeyEvent:
-            // FOR TESTING
-            if (e.KeyEvent.KeyCode == GLFW_KEY_SPACE && e.KeyEvent.Action == Wigner::KEY_PRESS) {
-                enumerate_moves(m_Board);
-            }
-        default:
-            break;
+            case Wigner::EventTag::KeyEvent:
+                // FOR TESTING
+                if (e.KeyEvent.KeyCode == GLFW_KEY_SPACE && e.KeyEvent.Action == Wigner::KEY_PRESS) {
+                    enumerate_moves(m_Board);
+                }
+            default:
+                break;
         }
         return true;
     };

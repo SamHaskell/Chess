@@ -5,7 +5,8 @@ namespace Chess {
     static Wigner::Color COLOR_OFFWHITE = {0.9f, 0.9f, 0.9f, 1.0f};
     static Wigner::Color COLOR_WHITE = {1.0f, 1.0f, 1.0f, 1.0f};
     static Wigner::Color COLOR_BLACK = {0.0f, 0.0f, 0.0f, 1.0f};
-    static Wigner::Color COLOR_RED_TINT = {0.8f, 0.6f, 0.1f, 1.0f};
+    static Wigner::Color COLOR_ORANGE = {0.8f, 0.6f, 0.1f, 1.0f};
+    static Wigner::Color COLOR_RED_TINT = {1.0f, 0.2f, 0.2f, 0.1f};
     static Wigner::Color COLOR_BLUE_TINT = {0.2f, 0.2f, 1.0f, 0.3f};
 
     i32 move_create(i32 origin, i32 target) {
@@ -17,11 +18,11 @@ namespace Chess {
     }
 
     i32 move_get_target(i32 movecode) {
-        return (movecode & MOVE_ORIGIN_MASK);
+        return (movecode & MOVE_TARGET_MASK) >> 6;
     }
 
     i32 move_get_origin(i32 movecode) {
-        return (movecode & MOVE_TARGET_MASK) >> 6;
+        return (movecode & MOVE_ORIGIN_MASK);
     }
 
     i32 get_rank(i32 location) {
@@ -30,6 +31,10 @@ namespace Chess {
 
     i32 get_file(i32 location) {
         return (location & 0b000111);
+    }
+
+    i32 get_location(i32 file, i32 rank) {
+        return (rank*8) + file;
     }
 
     bool move_is_en_passant(i32 movecode) {
@@ -53,36 +58,35 @@ namespace Chess {
         return ((piece & PIECE_WHITE) & (location/8 == 1)) || ((piece & PIECE_BLACK) & (location/8 == 6));
     }
 
-    std::vector<i32> enumerate_moves(const std::unique_ptr<Board>& board) {
-        auto moves = std::vector<i32>(); //SLOW BECAUSE WILL HAVE TO HEAP-REALLOCATE AS MOVELIST GROWS, TEMPORARY
+    void enumerate_moves(const std::unique_ptr<Board>& board) {
+        board->LegalMoves.clear(); //SLOW BECAUSE WILL HAVE TO HEAP-REALLOCATE AS MOVELIST GROWS, TEMPORARY
         for (i32 origin = 0; origin < 64; origin++) {
             i32 piece = board->Cells[origin];
             if (piece & board->CurrentColour) {
                 i32 piece_type = (piece & PIECE_TYPE_MASK);
                 switch (piece_type) {
                     case PIECE_PAWN:
-                        emplace_pawn_moves(board, moves, origin, piece);
+                        emplace_pawn_moves(board, board->LegalMoves, origin, piece);
                         break;
                     case PIECE_KNIGHT:
-                        emplace_knight_moves(board, moves, origin, piece);
+                        emplace_knight_moves(board, board->LegalMoves, origin, piece);
                         break;
                     case PIECE_ROOK:
-                        emplace_orthogonal_sliding_moves(board, moves, origin, piece);
+                        emplace_orthogonal_sliding_moves(board, board->LegalMoves, origin, piece);
                         break;
                     case PIECE_BISHOP:
-                        emplace_diagonal_sliding_moves(board, moves, origin, piece);
+                        emplace_diagonal_sliding_moves(board, board->LegalMoves, origin, piece);
                         break;
                     case PIECE_QUEEN:
-                        emplace_orthogonal_sliding_moves(board, moves, origin, piece);
-                        emplace_diagonal_sliding_moves(board, moves, origin, piece);
+                        emplace_orthogonal_sliding_moves(board, board->LegalMoves, origin, piece);
+                        emplace_diagonal_sliding_moves(board, board->LegalMoves, origin, piece);
                         break;
                     case PIECE_KING:
-                        emplace_king_moves(board, moves, origin, piece);
+                        emplace_king_moves(board, board->LegalMoves, origin, piece);
                 }
             }
         }
-        LOG_INFO("Number of available moves: %i", moves.size());
-        return moves;
+        LOG_INFO("Number of available moves: %i", board->LegalMoves.size());
     }
 
     void emplace_pawn_moves(const std::unique_ptr<Board>& board, std::vector<i32>& moves, i32 origin, i32 piece) {
@@ -127,7 +131,6 @@ namespace Chess {
         if (file != 7) {
             target = origin + forward + 1;
             if (are_opponents(piece, board->Cells[target])) {
-                LOG_INFO("%i", get_rank(target));
                 if (get_rank(target) % 7 == 0) {
                     moves.push_back(move_create(origin, target, MOVE_PROMOTE_CAPTURE_BISHOP));
                     moves.push_back(move_create(origin, target, MOVE_PROMOTE_CAPTURE_KNIGHT));
@@ -142,7 +145,41 @@ namespace Chess {
     }
 
     void emplace_knight_moves(const std::unique_ptr<Board>& board, std::vector<i32>& moves, i32 origin, i32 piece) {
+        i32 file = get_file(origin);
+        i32 rank = get_rank(origin);
 
+        i32 ranks[8] = { // DEFINITELY A BETTER WAY BUT I DONT CARE
+            rank + 1,
+            rank + 1,
+            rank - 1,
+            rank - 1,
+            rank + 2,
+            rank + 2,
+            rank - 2,
+            rank - 2
+        };
+
+        i32 files[8] = {
+            file + 2,
+            file - 2,
+            file + 2,
+            file - 2,
+            file + 1,
+            file - 1,
+            file + 1,
+            file - 1
+        };   
+
+        for (i32 i = 0; i < 8; i++) {
+            if (ranks[i] < 8 && ranks[i] >= 0 && files[i] < 8 && files[i] >= 0) {
+                i32 target = get_location(files[i], ranks[i]);
+                if (!board->Cells[target]) {
+                    moves.push_back(move_create(origin, target));
+                } else if (are_opponents(piece, board->Cells[target])) {
+                    moves.push_back(move_create(origin, target, MOVE_CAPTURE));
+                }
+            }
+        }
     }
 
     void emplace_orthogonal_sliding_moves(const std::unique_ptr<Board>& board, std::vector<i32>& moves, i32 origin, i32 piece) {
@@ -172,6 +209,7 @@ namespace Chess {
 
         //TO TEST PAWN BEHAVIOUR TEMPORARY
         board->Cells[49] = PIECE_PAWN   | PIECE_WHITE;
+        board->Cells[40] = PIECE_KNIGHT   | PIECE_WHITE;
 
         board->Cells[56] = PIECE_ROOK   | PIECE_BLACK;
         board->Cells[57] = PIECE_KNIGHT | PIECE_BLACK;
@@ -190,6 +228,8 @@ namespace Chess {
         board->CurrentColour = PIECE_WHITE;
         board->SelectedCell = BOARD_INVALID_CELL;
 
+        enumerate_moves(board);
+
         return board;
     }
 
@@ -203,8 +243,18 @@ namespace Chess {
                 Wigner::draw_quad(scene, board->DrawRect.X + dx * i, board->DrawRect.Y + dy * j, dx, dy, col);
             }
         }
+        
         if (board->SelectedCell != BOARD_INVALID_CELL) {
-            Wigner::draw_quad(scene, board->DrawRect.X + dx * get_file(board->SelectedCell), board->DrawRect.Y + dy * get_rank(board->SelectedCell), dx, dy, COLOR_RED_TINT);
+            Wigner::draw_quad(scene, board->DrawRect.X + dx * get_file(board->SelectedCell), board->DrawRect.Y + dy * get_rank(board->SelectedCell), dx, dy, COLOR_ORANGE);
+        }
+
+        // for (i32 move : board->LegalMoves) {
+        //     i32 target = move_get_target(move);
+        //     Wigner::draw_quad(scene, board->DrawRect.X + dx * get_file(target), board->DrawRect.Y + dy * get_rank(target), dx, dy, COLOR_RED_TINT);
+        // }
+
+        for (i32 target : board->HighlightedCells) {
+            Wigner::draw_quad(scene, board->DrawRect.X + dx * get_file(target), board->DrawRect.Y + dy * get_rank(target), dx, dy, COLOR_BLUE_TINT);
         }
 
         for (i32 i = 0; i < 8; i++) {
