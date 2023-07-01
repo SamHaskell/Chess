@@ -188,6 +188,7 @@ namespace Chess {
         }
 
         board->CurrentColour = PIECE_WHITE;
+        board->SelectedCell = BOARD_INVALID_CELL;
 
         return board;
     }
@@ -201,6 +202,9 @@ namespace Chess {
                 Wigner::Color col = ((i + j) % 2) ? COLOR_OFFWHITE : COLOR_DARKGREEN;
                 Wigner::draw_quad(scene, board->DrawRect.X + dx * i, board->DrawRect.Y + dy * j, dx, dy, col);
             }
+        }
+        if (board->SelectedCell != BOARD_INVALID_CELL) {
+            Wigner::draw_quad(scene, board->DrawRect.X + dx * get_file(board->SelectedCell), board->DrawRect.Y + dy * get_rank(board->SelectedCell), dx, dy, COLOR_RED_TINT);
         }
 
         for (i32 i = 0; i < 8; i++) {

@@ -49,6 +49,8 @@ namespace Chess {
         std::array<std::shared_ptr<Wigner::Texture2D>, 12> TextureArray;
     };
 
+    constexpr i32 BOARD_INVALID_CELL = 64;
+
     i32 move_create(i32 origin, i32 target);
     i32 move_create(i32 origin, i32 target, i32 flags);
 

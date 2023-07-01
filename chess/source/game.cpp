@@ -44,9 +44,12 @@ namespace Chess
                 i32 x = (i32)(8.0f * (m_MousePosition.X - m_Board->DrawRect.X) / m_Board->DrawRect.Width);
                 i32 y = (i32)(8.0f * (m_MousePosition.Y - m_Board->DrawRect.Y) / m_Board->DrawRect.Height);
 
-                if (!point_in_rect(m_MousePosition, m_Board->DrawRect))
-                {
-                    // DESELECT, CLICK WAS OFF BOARD
+                if (!point_in_rect(m_MousePosition, m_Board->DrawRect)) {
+                    m_Board->SelectedCell = BOARD_INVALID_CELL;
+                } else if (x == get_file(m_Board->SelectedCell) && y == get_rank(m_Board->SelectedCell)) {
+                    m_Board->SelectedCell = BOARD_INVALID_CELL;
+                } else {
+                    m_Board->SelectedCell = (y*8) + x;
                 }
             }
         case Wigner::EventTag::KeyEvent:
