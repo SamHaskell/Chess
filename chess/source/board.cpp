@@ -50,7 +50,7 @@ namespace Chess {
         return (movecode & (8 << 12));
     }
 
-    bool location_on_board(i32 file, i32 rank) {
+    bool is_location_on_board(i32 file, i32 rank) {
         return (rank < 8 && rank >= 0 && file < 8 && file >= 0);
     }
 
@@ -183,7 +183,7 @@ namespace Chess {
         };   
 
         for (i32 i = 0; i < 8; i++) {
-            if (location_on_board(files[i], ranks[i])) {
+            if (is_location_on_board(files[i], ranks[i])) {
                 i32 target = get_location(files[i], ranks[i]);
                 if (!board->Cells[target]) {
                     moves.push_back(move_create(origin, target));
@@ -206,7 +206,7 @@ namespace Chess {
             while (!obstructed) {
                 file += fileshifts[i];
                 rank += rankshifts[i];
-                if (location_on_board(file, rank)) {
+                if (is_location_on_board(file, rank)) {
                     if (are_opponents(piece, board->Cells[get_location(file, rank)])) {
                         moves.push_back(move_create(origin, get_location(file, rank), MOVE_CAPTURE));
                         obstructed = true;
@@ -234,7 +234,7 @@ namespace Chess {
             while (!obstructed) {
                 file += fileshifts[i];
                 rank += rankshifts[i];
-                if (location_on_board(file, rank)) {
+                if (is_location_on_board(file, rank)) {
                     if (are_opponents(piece, board->Cells[get_location(file, rank)])) {
                         moves.push_back(move_create(origin, get_location(file, rank), MOVE_CAPTURE));
                         obstructed = true;
@@ -251,7 +251,17 @@ namespace Chess {
     }
 
     void emplace_king_moves(const std::unique_ptr<Board>& board, std::vector<i32>& moves, i32 origin, i32 piece) {
-
+        for (i32 file = get_file(origin) - 1; file < get_file(origin) + 2; file++) {
+            for (i32 rank = get_rank(origin) - 1; rank < get_rank(origin) + 2; rank++) {
+                if (is_location_on_board(file, rank)) {
+                    if (are_opponents(piece, board->Cells[get_location(file, rank)])) {
+                        moves.push_back(move_create(origin, get_location(file, rank), MOVE_CAPTURE));
+                    } else if (!board->Cells[get_location(file, rank)]) {
+                        moves.push_back(move_create(origin, get_location(file, rank)));
+                    }
+                }
+            }
+        }
     }
 
     std::unique_ptr<Board> board_create_default() {
@@ -266,12 +276,6 @@ namespace Chess {
         board->Cells[5] = PIECE_BISHOP | PIECE_WHITE;
         board->Cells[6] = PIECE_KNIGHT | PIECE_WHITE;
         board->Cells[7] = PIECE_ROOK | PIECE_WHITE;
-
-        // TO TEST BEHAVIOUR, TEMPORARY
-        board->Cells[40] = PIECE_KNIGHT | PIECE_WHITE;
-        board->Cells[34] = PIECE_BISHOP | PIECE_WHITE;
-        board->Cells[37] = PIECE_ROOK | PIECE_WHITE;
-        ///////////////////////////////
 
         board->Cells[56] = PIECE_ROOK | PIECE_BLACK;
         board->Cells[57] = PIECE_KNIGHT | PIECE_BLACK;

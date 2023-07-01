@@ -70,7 +70,7 @@ namespace Chess {
     bool move_is_castling(i32 movecode);
     bool move_is_promotion(i32 movecode);
 
-    bool location_on_board(i32 file, i32 rank);
+    bool is_location_on_board(i32 file, i32 rank);
 
     bool are_opponents(i32 piece, i32 other);
     bool pawn_has_moved(i32 piece, i32 location);
