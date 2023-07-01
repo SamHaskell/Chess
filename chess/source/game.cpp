@@ -47,13 +47,8 @@ namespace Chess
                         m_Board->SelectedCell = BOARD_INVALID_CELL;
                         m_Board->HighlightedCells.clear();
                     } else {
-                        m_Board->SelectedCell = (y*8) + x;
-                        m_Board->HighlightedCells.clear();
-                        for (i32 move : m_Board->LegalMoves) {
-                            if (move_get_origin(move) == m_Board->SelectedCell) {
-                                m_Board->HighlightedCells.insert(move_get_target(move));
-                            }
-                        }
+                        m_Board->SelectedCell = get_location(x, y);
+                        update_highlighted_cells(m_Board);
                     }
                 }
             case Wigner::EventTag::KeyEvent:

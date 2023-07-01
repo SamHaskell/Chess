@@ -46,7 +46,9 @@ namespace Chess {
         i32 Cells[64];
         i32 CurrentColour;
         i32 SelectedCell;
+        bool Check;
         std::set<i32> HighlightedCells;
+        std::set<i32> AttackedCells;
         std::vector<i32> LegalMoves;
         Wigner::Rect2D DrawRect;
         std::array<std::shared_ptr<Wigner::Texture2D>, 12> TextureArray;
@@ -68,10 +70,15 @@ namespace Chess {
     bool move_is_castling(i32 movecode);
     bool move_is_promotion(i32 movecode);
 
+    bool location_on_board(i32 file, i32 rank);
+
     bool are_opponents(i32 piece, i32 other);
     bool pawn_has_moved(i32 piece, i32 location);
 
     void enumerate_moves(const std::unique_ptr<Board>& board);
+    void update_attacked_cells(const std::unique_ptr<Board>& board);
+    void update_highlighted_cells(const std::unique_ptr<Board>& board);
+
     void emplace_pawn_moves(const std::unique_ptr<Board>& board, std::vector<i32>& moves, i32 origin, i32 piece);
     void emplace_knight_moves(const std::unique_ptr<Board>& board, std::vector<i32>& moves, i32 origin, i32 piece);
     void emplace_orthogonal_sliding_moves(const std::unique_ptr<Board>& board, std::vector<i32>& moves, i32 origin, i32 piece);
@@ -81,6 +88,5 @@ namespace Chess {
     std::unique_ptr<Board> board_create_default();
     void board_load_textures(const std::unique_ptr<Board>& board);
     void board_render(const std::unique_ptr<Board>& board, Wigner::SceneData scene);
-
     void board_on_move(const std::unique_ptr<Board>& board, i32 move);
 }
