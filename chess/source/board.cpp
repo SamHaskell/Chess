@@ -59,7 +59,7 @@ namespace Chess {
     }
 
     bool pawn_has_moved(i32 piece, i32 location) {
-        return ((piece & PIECE_WHITE) & (location/8 == 1)) || ((piece & PIECE_BLACK) & (location/8 == 6));
+        return (((piece & PIECE_WHITE) && (get_rank(location) != 1)) || ((piece & PIECE_BLACK) && (get_rank(location) != 6)));
     }
 
     void enumerate_moves(const std::unique_ptr<Board>& board) {
@@ -90,7 +90,6 @@ namespace Chess {
                 }
             }
         }
-        LOG_INFO("Number of available moves: %i", board->LegalMoves.size());
     }
 
     void update_attacked_cells(const std::unique_ptr<Board>& board) {
@@ -100,11 +99,11 @@ namespace Chess {
         }
     }
 
-    void update_highlighted_cells(const std::unique_ptr<Board>& board) {
-        board->HighlightedCells.clear();
+    void update_highlighted_moves(const std::unique_ptr<Board>& board) {
+        board->HighlightedMoves.clear();
         for (i32 move : board->LegalMoves) {
             if (move_get_origin(move) == board->SelectedCell) {
-                board->HighlightedCells.insert(move_get_target(move));
+                board->HighlightedMoves.insert(move);
             }
         }
     }
@@ -293,12 +292,9 @@ namespace Chess {
 
         board->SelectedCell = BOARD_INVALID_CELL;
 
+        //PLAY A FAKE "FIRST MOVE" TO GENERATE INFO
         board->CurrentColour = PIECE_BLACK;
-        enumerate_moves(board);
-        update_attacked_cells(board);    
-        update_highlighted_cells(board);
-        board->CurrentColour = PIECE_WHITE;
-        enumerate_moves(board);
+        board_on_turn_end(board);
 
         return board;
     }
@@ -322,7 +318,8 @@ namespace Chess {
             Wigner::draw_quad(scene, board->DrawRect.X + dx * get_file(target), board->DrawRect.Y + dy * get_rank(target), dx, dy, COLOR_RED_TINT);
         }
 
-        for (i32 target : board->HighlightedCells) {
+        for (i32 move : board->HighlightedMoves) {
+            i32 target = move_get_target(move);
             Wigner::draw_quad(scene, board->DrawRect.X + dx * get_file(target), board->DrawRect.Y + dy * get_rank(target), dx, dy, COLOR_BLUE_TINT);
         }
 
@@ -365,11 +362,46 @@ namespace Chess {
         board->TextureArray[11] = Wigner::Texture2D::Create("assets/user/textures/b_king_2x.png");
     }
 
-    void board_on_move(const std::unique_ptr<Board>& board, i32 move) {
+    void board_on_cell_deselect(const std::unique_ptr<Board>& board) {
+        board->SelectedCell = BOARD_INVALID_CELL;
+        board->HighlightedMoves.clear();
+    }
 
+    void board_on_cell_select(const std::unique_ptr<Board>& board, i32 file, i32 rank) {
+        if ((file == get_file(board->SelectedCell)) && (rank == get_rank(board->SelectedCell))) {
+            board_on_cell_deselect(board);
+            return;
+        } 
+        if (board->Cells[get_location(file, rank)] & board->CurrentColour) {
+            board->SelectedCell = get_location(file, rank);
+            update_highlighted_moves(board);
+            return;
+        }
+        for (i32 move : board->HighlightedMoves) {
+            if (get_location(file, rank) == move_get_target(move)) {
+                board_on_move(board, move);
+                return;
+            }
+        }
+        if (!board->Cells[get_location(file, rank)]) {
+            board_on_cell_deselect(board);
+            return;
+        }
+    }
+
+    void board_on_move(const std::unique_ptr<Board>& board, i32 move) {
+        LOG_INFO("THATS A VALID MOVE: NICE!");
+        i32 piece = board->Cells[move_get_target(move)];
+        board->Cells[move_get_target(move)] = board->Cells[move_get_origin(move)];
+        board->Cells[move_get_origin(move)] = PIECE_NONE;
+        board_on_cell_deselect(board);
+        board_on_turn_end(board);
     }
 
     void board_on_turn_end(const std::unique_ptr<Board>& board) {
-
+        enumerate_moves(board);
+        update_attacked_cells(board);
+        board->CurrentColour = (board->CurrentColour & PIECE_WHITE) ? PIECE_BLACK : PIECE_WHITE;
+        enumerate_moves(board);
     }
 }

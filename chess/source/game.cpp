@@ -40,15 +40,10 @@ namespace Chess
                 if (e.MouseButtonEvent.ButtonCode == GLFW_MOUSE_BUTTON_LEFT && e.MouseButtonEvent.Action == Wigner::MOUSEBUTTON_PRESS) {
                     i32 x = (i32)(8.0f * (m_MousePosition.X - m_Board->DrawRect.X) / m_Board->DrawRect.Width);
                     i32 y = (i32)(8.0f * (m_MousePosition.Y - m_Board->DrawRect.Y) / m_Board->DrawRect.Height);
-                    if (!point_in_rect(m_MousePosition, m_Board->DrawRect)) {
-                        m_Board->SelectedCell = BOARD_INVALID_CELL;
-                        m_Board->HighlightedCells.clear();
-                    } else if (x == get_file(m_Board->SelectedCell) && y == get_rank(m_Board->SelectedCell)) {
-                        m_Board->SelectedCell = BOARD_INVALID_CELL;
-                        m_Board->HighlightedCells.clear();
+                    if (point_in_rect(m_MousePosition, m_Board->DrawRect)) {
+                        board_on_cell_select(m_Board, x, y);
                     } else {
-                        m_Board->SelectedCell = get_location(x, y);
-                        update_highlighted_cells(m_Board);
+                        board_on_cell_deselect(m_Board);
                     }
                 }
             case Wigner::EventTag::KeyEvent:

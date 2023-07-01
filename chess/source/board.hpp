@@ -47,9 +47,9 @@ namespace Chess {
         i32 CurrentColour;
         i32 SelectedCell;
         bool Check;
-        std::set<i32> HighlightedCells;
         std::set<i32> AttackedCells;
         std::vector<i32> LegalMoves;
+        std::set<i32> HighlightedMoves;
         Wigner::Rect2D DrawRect;
         std::array<std::shared_ptr<Wigner::Texture2D>, 12> TextureArray;
     };
@@ -88,5 +88,8 @@ namespace Chess {
     std::unique_ptr<Board> board_create_default();
     void board_load_textures(const std::unique_ptr<Board>& board);
     void board_render(const std::unique_ptr<Board>& board, Wigner::SceneData scene);
+    void board_on_cell_deselect(const std::unique_ptr<Board>& board);
+    void board_on_cell_select(const std::unique_ptr<Board>& board, i32 file, i32 rank);
     void board_on_move(const std::unique_ptr<Board>& board, i32 move);
+    void board_on_turn_end(const std::unique_ptr<Board>& board);
 }
