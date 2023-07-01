@@ -20,6 +20,6 @@ namespace Chess {
             Wigner::OrthographicCamera m_MainCamera;
             Wigner::Rect2D m_ScreenRect;
             Wigner::Point2D m_MousePosition;
-            std::unique_ptr<Board> m_Board;
+            std::unique_ptr<GameData> m_GameData;
     };
 }

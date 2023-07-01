@@ -7,7 +7,7 @@ namespace Chess
           m_ScreenRect({0.0f, 0.0f, 1280.0f, 720.0f})
     {
         Wigner::renderer_init();
-        m_Board = board_create_default();
+        m_GameData = board_create_default();
     }
 
     Game::~Game()
@@ -18,13 +18,14 @@ namespace Chess
     void Game::Update(f64 dt)
     {
         Wigner::Point2D center = rect_get_center(m_ScreenRect);
-        m_Board->DrawRect = {center.X - 320.0f, center.Y - 320.0f, 640.0f, 640.0f};
+        m_GameData->ElapsedTime += dt;
+        m_GameData->BoardRect = {center.X - 320.0f, center.Y - 320.0f, 640.0f, 640.0f};
     }
 
     void Game::Render()
     {
         auto scene = Wigner::scene_begin(m_MainCamera);
-        board_render(m_Board, scene);
+        board_render(m_GameData, scene);
     }
 
     bool Game::OnEvent(Wigner::Event &e)
@@ -38,19 +39,16 @@ namespace Chess
                 m_MousePosition = {(f32)e.MouseMoveEvent.X, m_ScreenRect.Height - (f32)e.MouseMoveEvent.Y};
             case Wigner::EventTag::MouseButtonEvent:
                 if (e.MouseButtonEvent.ButtonCode == GLFW_MOUSE_BUTTON_LEFT && e.MouseButtonEvent.Action == Wigner::MOUSEBUTTON_PRESS) {
-                    i32 x = (i32)(8.0f * (m_MousePosition.X - m_Board->DrawRect.X) / m_Board->DrawRect.Width);
-                    i32 y = (i32)(8.0f * (m_MousePosition.Y - m_Board->DrawRect.Y) / m_Board->DrawRect.Height);
-                    if (point_in_rect(m_MousePosition, m_Board->DrawRect)) {
-                        board_on_cell_select(m_Board, x, y);
+                    i32 x = (i32)(8.0f * (m_MousePosition.X - m_GameData->BoardRect.X) / m_GameData->BoardRect.Width);
+                    i32 y = (i32)(8.0f * (m_MousePosition.Y - m_GameData->BoardRect.Y) / m_GameData->BoardRect.Height);
+                    if (point_in_rect(m_MousePosition, m_GameData->BoardRect)) {
+                        board_on_cell_select(m_GameData, x, y);
                     } else {
-                        board_on_cell_deselect(m_Board);
+                        board_on_cell_deselect(m_GameData);
                     }
                 }
             case Wigner::EventTag::KeyEvent:
-                // FOR TESTING
-                if (e.KeyEvent.KeyCode == GLFW_KEY_SPACE && e.KeyEvent.Action == Wigner::KEY_PRESS) {
-                    enumerate_moves(m_Board);
-                }
+
             default:
                 break;
         }
