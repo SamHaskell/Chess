@@ -9,13 +9,13 @@ set(
     LOCAL_SOURCES
     ${PROJECT_SOURCE_DIR}/source/main.cpp
     ${PROJECT_SOURCE_DIR}/source/game.cpp
-    ${PROJECT_SOURCE_DIR}/source/state.cpp
+    ${PROJECT_SOURCE_DIR}/source/board.cpp
 )
 
 set(
     LOCAL_HEADERS
     ${PROJECT_SOURCE_DIR}/source/game.hpp
-    ${PROJECT_SOURCE_DIR}/source/state.hpp
+    ${PROJECT_SOURCE_DIR}/source/board.hpp
 )
 
 add_executable(

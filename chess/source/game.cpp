@@ -7,7 +7,7 @@ namespace Chess
           m_ScreenRect({0.0f, 0.0f, 1280.0f, 720.0f})
     {
         Wigner::renderer_init();
-        m_GameState = gamestate_create();
+        m_Board = board_create_default();
     }
 
     Game::~Game()
@@ -18,14 +18,14 @@ namespace Chess
     void Game::Update(f64 dt)
     {
         Wigner::Point2D center = rect_get_center(m_ScreenRect);
-        m_GameState->BoardRect = {center.X - 320.0f, center.Y - 320.0f, 640.0f, 640.0f};
-        gamestate_update(m_GameState, dt);
+        // gamestate_update(m_GameState, dt);
+        m_Board->DrawRect = {center.X - 320.0f, center.Y - 320.0f, 640.0f, 640.0f};
     }
 
     void Game::Render()
     {
         auto scene = Wigner::scene_begin(m_MainCamera);
-        board_render(m_GameState, scene);
+        board_render(m_Board, scene);
     }
 
     bool Game::OnEvent(Wigner::Event &e)
@@ -39,23 +39,20 @@ namespace Chess
         case Wigner::EventTag::MouseMoveEvent:
             m_MousePosition = {(f32)e.MouseMoveEvent.X, m_ScreenRect.Height - (f32)e.MouseMoveEvent.Y};
         case Wigner::EventTag::MouseButtonEvent:
-            if (e.MouseButtonEvent.ButtonCode == GLFW_MOUSE_BUTTON_LEFT && e.MouseButtonEvent.Action == GLFW_PRESS) {
-                i32 x = (i32)(8.0f*(m_MousePosition.X - m_GameState->BoardRect.X)/m_GameState->BoardRect.Width);
-                i32 y = (i32)(8.0f*(m_MousePosition.Y - m_GameState->BoardRect.Y)/m_GameState->BoardRect.Height);
-                Coord temp = {x, y};
-                if (!point_in_rect(m_MousePosition, m_GameState->BoardRect)) {
-                    on_cell_deselect(m_GameState);
-                } else if (temp.X == m_GameState->SelectedCell.X && temp.Y == m_GameState->SelectedCell.Y) {
-                    on_cell_deselect(m_GameState);
-                } else {
-                    on_cell_select(m_GameState, temp);
+            if (e.MouseButtonEvent.ButtonCode == GLFW_MOUSE_BUTTON_LEFT && e.MouseButtonEvent.Action == Wigner::MOUSEBUTTON_PRESS)
+            {
+                i32 x = (i32)(8.0f * (m_MousePosition.X - m_Board->DrawRect.X) / m_Board->DrawRect.Width);
+                i32 y = (i32)(8.0f * (m_MousePosition.Y - m_Board->DrawRect.Y) / m_Board->DrawRect.Height);
+
+                if (!point_in_rect(m_MousePosition, m_Board->DrawRect))
+                {
+                    // DESELECT, CLICK WAS OFF BOARD
                 }
             }
         case Wigner::EventTag::KeyEvent:
-            if (e.KeyEvent.KeyCode == GLFW_KEY_SPACE && e.KeyEvent.Action == GLFW_PRESS) {
-                on_cell_deselect(m_GameState);
-                m_GameState->CurrentTeam = (Team)(((i32)m_GameState->CurrentTeam + 1) % 2);
-                LOG_INFO("TEAM SWITCHED!");
+            // FOR TESTING
+            if (e.KeyEvent.KeyCode == GLFW_KEY_SPACE && e.KeyEvent.Action == Wigner::KEY_PRESS) {
+                enumerate_moves(m_Board);
             }
         default:
             break;

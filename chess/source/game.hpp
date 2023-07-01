@@ -3,7 +3,7 @@
 #include <Wigner.hpp>
 #include <iostream>
 
-#include "state.hpp"
+#include "board.hpp"
 
 namespace Chess {
     class Game : public Wigner::Layer {
@@ -20,6 +20,6 @@ namespace Chess {
             Wigner::OrthographicCamera m_MainCamera;
             Wigner::Rect2D m_ScreenRect;
             Wigner::Point2D m_MousePosition;
-            std::unique_ptr<GameState> m_GameState;
+            std::unique_ptr<Board> m_Board;
     };
 }
