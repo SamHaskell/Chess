@@ -10,12 +10,18 @@ set(
     ${PROJECT_SOURCE_DIR}/source/main.cpp
     ${PROJECT_SOURCE_DIR}/source/game.cpp
     ${PROJECT_SOURCE_DIR}/source/board.cpp
+    ${PROJECT_SOURCE_DIR}/source/move.cpp
+    ${PROJECT_SOURCE_DIR}/source/piece.cpp
+    ${PROJECT_SOURCE_DIR}/source/pin.cpp
 )
 
 set(
     LOCAL_HEADERS
     ${PROJECT_SOURCE_DIR}/source/game.hpp
     ${PROJECT_SOURCE_DIR}/source/board.hpp
+    ${PROJECT_SOURCE_DIR}/source/move.hpp
+    ${PROJECT_SOURCE_DIR}/source/piece.hpp
+    ${PROJECT_SOURCE_DIR}/source/pin.hpp
 )
 
 add_executable(

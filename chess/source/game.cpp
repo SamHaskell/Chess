@@ -7,7 +7,7 @@ namespace Chess
           m_ScreenRect({0.0f, 0.0f, 1280.0f, 720.0f})
     {
         Wigner::renderer_init();
-        m_GameData = board_create_default();
+        m_GameData = game_create_default();
     }
 
     Game::~Game()
@@ -25,7 +25,7 @@ namespace Chess
     void Game::Render()
     {
         auto scene = Wigner::scene_begin(m_MainCamera);
-        board_render(m_GameData, scene);
+        game_render(m_GameData, scene);
     }
 
     bool Game::OnEvent(Wigner::Event &e)
@@ -42,9 +42,9 @@ namespace Chess
                     i32 x = (i32)(8.0f * (m_MousePosition.X - m_GameData->BoardRect.X) / m_GameData->BoardRect.Width);
                     i32 y = (i32)(8.0f * (m_MousePosition.Y - m_GameData->BoardRect.Y) / m_GameData->BoardRect.Height);
                     if (point_in_rect(m_MousePosition, m_GameData->BoardRect)) {
-                        board_on_cell_select(m_GameData, x, y);
+                        game_on_cell_select(m_GameData, x, y);
                     } else {
-                        board_on_cell_deselect(m_GameData);
+                        game_on_cell_deselect(m_GameData);
                     }
                 }
             case Wigner::EventTag::KeyEvent:
