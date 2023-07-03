@@ -11,4 +11,4 @@ Once the core functionality is in, and you can enjoy a quick game against a rela
 - Challenges and mating practice.
 - Detection of common openers.
 
-(03/07/2023)
+Last Edited (03/07/2023)
