@@ -16,8 +16,8 @@ namespace Chess {
     void enumerate_moves(const std::unique_ptr<GameData>& state) {
         state->LegalMoves.clear(); //SLOW BECAUSE WILL HAVE TO HEAP-REALLOCATE AS MOVELIST GROWS, TEMPORARY
         for (i32 origin = 0; origin < 64; origin++) {
-            i32 piece = state->CurrentBoard[origin];
-            if (piece & state->CurrentPlayer) {
+            i32 piece = state->CurrentPosition.Board[origin];
+            if (piece & state->CurrentPosition.Player) {
                 i32 piece_type = (piece & PIECE_TYPE_MASK);
                 switch (piece_type) {
                     case PIECE_PAWN:
@@ -68,7 +68,7 @@ namespace Chess {
         i32 rank = get_rank(origin);
 
         //SINGLE STEP
-        if (!state->CurrentBoard[target]) {
+        if (!state->CurrentPosition.Board[target]) {
             if (get_rank(target) % 7 == 0) {
                 moves.push_back(move_create(origin, target, MOVE_PROMOTE_BISHOP));
                 moves.push_back(move_create(origin, target, MOVE_PROMOTE_KNIGHT));
@@ -80,7 +80,7 @@ namespace Chess {
             //DOUBLE STEP ONLY POSSIBLE IF SINGLE WAS
             if (!pawn_has_moved(piece, origin)) {
                 target = origin + 2*forward;
-                if (!state->CurrentBoard[target]) {
+                if (!state->CurrentPosition.Board[target]) {
                     moves.push_back(move_create(origin, target, MOVE_PAWN_DOUBLE_STEP));
                 }
             }
@@ -89,7 +89,7 @@ namespace Chess {
         //DIAGONAL CAPTURE
         if (file != 0) {
             target = origin + forward - 1;
-            if (are_opponents(piece, state->CurrentBoard[target])) {
+            if (are_opponents(piece, state->CurrentPosition.Board[target])) {
                 if (get_rank(target) % 7 == 0) {
                     moves.push_back(move_create(origin, target, MOVE_PROMOTE_CAPTURE_BISHOP));
                     moves.push_back(move_create(origin, target, MOVE_PROMOTE_CAPTURE_KNIGHT));
@@ -99,13 +99,13 @@ namespace Chess {
                     moves.push_back(move_create(origin, target, MOVE_CAPTURE));
                 }
             }
-            if (target == state->CurrentEnPassantTarget) {
+            if (target == state->CurrentPosition.EnPassantTarget) {
                 moves.push_back(move_create(origin, target, MOVE_EN_PASSANT));
             }
         }  
         if (file != 7) {
             target = origin + forward + 1;
-            if (are_opponents(piece, state->CurrentBoard[target])) {
+            if (are_opponents(piece, state->CurrentPosition.Board[target])) {
                 if (get_rank(target) % 7 == 0) {
                     moves.push_back(move_create(origin, target, MOVE_PROMOTE_CAPTURE_BISHOP));
                     moves.push_back(move_create(origin, target, MOVE_PROMOTE_CAPTURE_KNIGHT));
@@ -115,7 +115,7 @@ namespace Chess {
                     moves.push_back(move_create(origin, target, MOVE_CAPTURE));
                 }
             }
-            if (target == state->CurrentEnPassantTarget) {
+            if (target == state->CurrentPosition.EnPassantTarget) {
                 moves.push_back(move_create(origin, target, MOVE_EN_PASSANT));
             }
         }
@@ -142,9 +142,9 @@ namespace Chess {
         for (i32 i = 0; i < 8; i++) {
             if (is_location_on_board(files[i], ranks[i])) {
                 i32 target = get_location(files[i], ranks[i]);
-                if (!state->CurrentBoard[target]) {
+                if (!state->CurrentPosition.Board[target]) {
                     moves.push_back(move_create(origin, target));
-                } else if (are_opponents(piece, state->CurrentBoard[target])) {
+                } else if (are_opponents(piece, state->CurrentPosition.Board[target])) {
                     moves.push_back(move_create(origin, target, MOVE_CAPTURE));
                 }
             }
@@ -167,10 +167,10 @@ namespace Chess {
                 file += fileshifts[i];
                 rank += rankshifts[i];
                 if (is_location_on_board(file, rank)) {
-                    if (are_opponents(piece, state->CurrentBoard[get_location(file, rank)])) {
+                    if (are_opponents(piece, state->CurrentPosition.Board[get_location(file, rank)])) {
                         moves.push_back(move_create(origin, get_location(file, rank), MOVE_CAPTURE));
                         obstructed = true;
-                    } else if (!state->CurrentBoard[get_location(file, rank)]) {
+                    } else if (!state->CurrentPosition.Board[get_location(file, rank)]) {
                         moves.push_back(move_create(origin, get_location(file, rank)));
                     } else {
                         obstructed = true;
@@ -195,10 +195,10 @@ namespace Chess {
                 file += fileshifts[i];
                 rank += rankshifts[i];
                 if (is_location_on_board(file, rank)) {
-                    if (are_opponents(piece, state->CurrentBoard[get_location(file, rank)])) {
+                    if (are_opponents(piece, state->CurrentPosition.Board[get_location(file, rank)])) {
                         moves.push_back(move_create(origin, get_location(file, rank), MOVE_CAPTURE));
                         obstructed = true;
-                    } else if (!state->CurrentBoard[get_location(file, rank)]) {
+                    } else if (!state->CurrentPosition.Board[get_location(file, rank)]) {
                         moves.push_back(move_create(origin, get_location(file, rank)));
                     } else {
                         obstructed = true;
@@ -214,9 +214,9 @@ namespace Chess {
         for (i32 file = get_file(origin) - 1; file < get_file(origin) + 2; file++) {
             for (i32 rank = get_rank(origin) - 1; rank < get_rank(origin) + 2; rank++) {
                 if (is_location_on_board(file, rank)) {
-                    if (are_opponents(piece, state->CurrentBoard[get_location(file, rank)])) {
+                    if (are_opponents(piece, state->CurrentPosition.Board[get_location(file, rank)])) {
                         moves.push_back(move_create(origin, get_location(file, rank), MOVE_CAPTURE));
-                    } else if (!state->CurrentBoard[get_location(file, rank)]) {
+                    } else if (!state->CurrentPosition.Board[get_location(file, rank)]) {
                         moves.push_back(move_create(origin, get_location(file, rank)));
                     }
                 }
@@ -224,39 +224,26 @@ namespace Chess {
         }
     }
 
+    std::unique_ptr<GameData> game_create_from_fen(const std::string& fen) {
+        auto state = std::make_unique<GameData>();
+        game_load_textures(state);
+
+        state->CurrentPosition = read_position(fen);
+        state->SelectedCell = BOARD_INVALID_CELL;
+
+        enumerate_moves(state);
+
+        return state;
+    }
+
     std::unique_ptr<GameData> game_create_default() {
         auto state = std::make_unique<GameData>();
         game_load_textures(state);
 
-        state->CurrentBoard[0] = PIECE_ROOK | PIECE_WHITE;
-        state->CurrentBoard[1] = PIECE_KNIGHT | PIECE_WHITE;
-        state->CurrentBoard[2] = PIECE_BISHOP | PIECE_WHITE;
-        state->CurrentBoard[3] = PIECE_QUEEN | PIECE_WHITE;
-        state->CurrentBoard[4] = PIECE_KING | PIECE_WHITE;
-        state->CurrentBoard[5] = PIECE_BISHOP | PIECE_WHITE;
-        state->CurrentBoard[6] = PIECE_KNIGHT | PIECE_WHITE;
-        state->CurrentBoard[7] = PIECE_ROOK | PIECE_WHITE;
-
-        state->CurrentBoard[56] = PIECE_ROOK | PIECE_BLACK;
-        state->CurrentBoard[57] = PIECE_KNIGHT | PIECE_BLACK;
-        state->CurrentBoard[58] = PIECE_BISHOP | PIECE_BLACK;
-        state->CurrentBoard[59] = PIECE_QUEEN | PIECE_BLACK;
-        state->CurrentBoard[60] = PIECE_KING | PIECE_BLACK;
-        state->CurrentBoard[61] = PIECE_BISHOP | PIECE_BLACK;
-        state->CurrentBoard[62] = PIECE_KNIGHT | PIECE_BLACK;
-        state->CurrentBoard[63] = PIECE_ROOK | PIECE_BLACK;
-
-        for (i32 i = 0; i < 8; i++) {
-            state->CurrentBoard[i + 8] = PIECE_PAWN | PIECE_WHITE;
-            state->CurrentBoard[i + 48] = PIECE_PAWN | PIECE_BLACK;
-        }
-
+        state->CurrentPosition = create_default_position();
         state->SelectedCell = BOARD_INVALID_CELL;
-        state->CurrentEnPassantTarget = BOARD_INVALID_CELL;
-        state->CurrentCastlingFlags = CASTLE_BLACK_KING | CASTLE_BLACK_QUEEN | CASTLE_WHITE_KING | CASTLE_WHITE_QUEEN;
 
-        //PLAY A FAKE "FIRST MOVE" TO GENERATE INFO
-        state->CurrentPlayer = PIECE_BLACK;
+        state->CurrentPosition.Player = PIECE_BLACK;
         game_on_turn_end(state);
 
         return state;
@@ -288,8 +275,8 @@ namespace Chess {
 
         for (i32 i = 0; i < 8; i++) {
             for (i32 j = 0; j < 8; j++) {
-                i32 piece = state->CurrentBoard[j*8 + i];
-                if (piece) {
+                i32 piece = state->CurrentPosition.Board[j*8 + i];
+                if ((piece & PIECE_COLOR_MASK) && (piece & PIECE_TYPE_MASK)) {
                     auto tex = state->TextureArray[(piece & PIECE_TYPE_MASK) - 1 + (6 * (bool)(piece & PIECE_BLACK))];
                     f32 w, h, xoff, yoff;
                     h = (true) ? dy * 0.7f : dy * 0.8f;
@@ -336,7 +323,7 @@ namespace Chess {
             game_on_cell_deselect(state);
             return;
         } 
-        if (state->CurrentBoard[get_location(file, rank)] & state->CurrentPlayer) {
+        if (state->CurrentPosition.Board[get_location(file, rank)] & state->CurrentPosition.Player) {
             state->SelectedCell = get_location(file, rank);
             update_highlighted_moves(state);
             return;
@@ -347,23 +334,23 @@ namespace Chess {
                 return;
             }
         }
-        if (!state->CurrentBoard[get_location(file, rank)]) {
+        if (!state->CurrentPosition.Board[get_location(file, rank)]) {
             game_on_cell_deselect(state);
             return;
         }
     }
 
     void game_on_move(const std::unique_ptr<GameData>& state, i32 move) {
-        i32 piece = state->CurrentBoard[move_get_target(move)];
-        state->CurrentBoard[move_get_target(move)] = state->CurrentBoard[move_get_origin(move)];
-        state->CurrentBoard[move_get_origin(move)] = PIECE_NONE;
+        i32 piece = state->CurrentPosition.Board[move_get_target(move)];
+        state->CurrentPosition.Board[move_get_target(move)] = state->CurrentPosition.Board[move_get_origin(move)];
+        state->CurrentPosition.Board[move_get_origin(move)] = PIECE_NONE;
         if (move_is_en_passant(move)) {
-            auto capture_location = get_location(get_file(state->CurrentEnPassantTarget), get_rank(move_get_origin(move)));
-            state->CurrentBoard[capture_location] = PIECE_NONE;
+            auto capture_location = get_location(get_file(state->CurrentPosition.EnPassantTarget), get_rank(move_get_origin(move)));
+            state->CurrentPosition.Board[capture_location] = PIECE_NONE;
         }
-        state->CurrentEnPassantTarget = BOARD_INVALID_CELL;
+        state->CurrentPosition.EnPassantTarget = BOARD_INVALID_CELL;
         if ((move & MOVE_FLAG_MASK) == MOVE_PAWN_DOUBLE_STEP) {
-            state->CurrentEnPassantTarget = (move_get_target(move) + move_get_origin(move)) / 2;
+            state->CurrentPosition.EnPassantTarget = (move_get_target(move) + move_get_origin(move)) / 2;
         }
         game_on_cell_deselect(state);
         game_on_turn_end(state);
@@ -372,7 +359,7 @@ namespace Chess {
     void game_on_turn_end(const std::unique_ptr<GameData>& state) {
         enumerate_moves(state);
         update_attacked_cells(state);
-        state->CurrentPlayer = (state->CurrentPlayer & PIECE_WHITE) ? PIECE_BLACK : PIECE_WHITE;
+        state->CurrentPosition.Player = (state->CurrentPosition.Player & PIECE_WHITE) ? PIECE_BLACK : PIECE_WHITE;
         enumerate_moves(state);
     }
 }

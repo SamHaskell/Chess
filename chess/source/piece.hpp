@@ -21,6 +21,8 @@ namespace Chess {
         PIECE_COLOR_MASK = 24,
     };
 
+    bool piece_from_char(u8 c, i32& piece);
+
     bool are_opponents(i32 piece, i32 other);
     bool can_slide_orthogonal(i32 piece);
     bool can_slide_diagonal(i32 piece);

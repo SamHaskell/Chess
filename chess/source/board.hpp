@@ -2,6 +2,7 @@
 
 #include <Wigner.hpp>
 
+#include "position.hpp"
 #include "piece.hpp"
 #include "move.hpp"
 #include "pin.hpp"
@@ -11,22 +12,10 @@
 #include <set>
 
 namespace Chess {
-    enum CastlingFlags {
-        CASTLE_WHITE_KING = (1 << 0),
-        CASTLE_BLACK_KING = (1 << 1),
-        CASTLE_WHITE_QUEEN = (1 << 2),
-        CASTLE_BLACK_QUEEN = (1 << 3)
-    };
-
     struct GameData {
-        //POTENTIALLY PUT THIS INTO A BOARD STRUCT SO WE CAN STORE PREVIOUS TURNS
-        i32 CurrentBoard[64];
-        i32 CurrentCastlingFlags;
-        i32 CurrentEnPassantTarget;
-        i32 CurrentPlayer;
+        Position CurrentPosition;
         std::set<i32> AttackedCells;
         std::vector<i32> LegalMoves;
-        
         i32 SelectedCell;
         std::vector<i32> HighlightedMoves;
         std::set<i32> HighlightedCells;
@@ -34,8 +23,6 @@ namespace Chess {
         f64 ElapsedTime;
         std::array<std::shared_ptr<Wigner::Texture2D>, 12> TextureArray;
     };
-
-    constexpr i32 BOARD_INVALID_CELL = 64;
 
     bool pawn_has_moved(i32 piece, i32 location);
 
@@ -49,6 +36,7 @@ namespace Chess {
     void emplace_diagonal_sliding_moves(const std::unique_ptr<GameData>& state, std::vector<i32>& moves, i32 origin, i32 piece);
     void emplace_king_moves(const std::unique_ptr<GameData>& state, std::vector<i32>& moves, i32 origin, i32 piece);
 
+    std::unique_ptr<GameData> game_create_from_fen(const std::string& fen);
     std::unique_ptr<GameData> game_create_default();
     void game_load_textures(const std::unique_ptr<GameData>& state);
     void game_render(const std::unique_ptr<GameData>& state, Wigner::SceneData scene);

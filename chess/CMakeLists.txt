@@ -9,6 +9,7 @@ set(
     LOCAL_SOURCES
     ${PROJECT_SOURCE_DIR}/source/main.cpp
     ${PROJECT_SOURCE_DIR}/source/game.cpp
+    ${PROJECT_SOURCE_DIR}/source/position.cpp
     ${PROJECT_SOURCE_DIR}/source/board.cpp
     ${PROJECT_SOURCE_DIR}/source/move.cpp
     ${PROJECT_SOURCE_DIR}/source/piece.cpp
@@ -18,6 +19,7 @@ set(
 set(
     LOCAL_HEADERS
     ${PROJECT_SOURCE_DIR}/source/game.hpp
+    ${PROJECT_SOURCE_DIR}/source/position.hpp
     ${PROJECT_SOURCE_DIR}/source/board.hpp
     ${PROJECT_SOURCE_DIR}/source/move.hpp
     ${PROJECT_SOURCE_DIR}/source/piece.hpp
