@@ -42,6 +42,10 @@ namespace Chess {
         return (movecode & (8 << 12));
     }
 
+    bool pawn_has_moved(i32 piece, i32 location) {
+        return (((piece & PIECE_WHITE) && (get_rank(location) != 1)) || ((piece & PIECE_BLACK) && (get_rank(location) != 6)));
+    }
+
     bool is_location_on_board(i32 file, i32 rank) {
         return (rank < 8 && rank >= 0 && file < 8 && file >= 0);
     }

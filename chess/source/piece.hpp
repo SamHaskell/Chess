@@ -2,10 +2,6 @@
 
 #include <Wigner.hpp>
 
-#include <memory> 
-#include <array> 
-#include <set>
-
 namespace Chess {
     enum Piece {
         PIECE_NONE = 0,

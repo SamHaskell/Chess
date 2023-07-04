@@ -2,9 +2,7 @@
 
 #include <Wigner.hpp>
 
-#include <memory> 
-#include <array> 
-#include <set>
+#include "piece.hpp"
 
 namespace Chess {
     enum Moves {
@@ -41,6 +39,8 @@ namespace Chess {
     bool move_is_en_passant(i32 move);
     bool move_is_castling(i32 move);
     bool move_is_promotion(i32 move);
+
+    bool pawn_has_moved(i32 piece, i32 location);
 
     bool is_location_on_board(i32 file, i32 rank);
 }

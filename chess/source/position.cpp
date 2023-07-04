@@ -7,7 +7,7 @@
 namespace Chess {
     static const std::string default_game_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-    Position read_position(const std::string& fen) {
+    Position position_read(const std::string& fen) {
         Position position = {};
         std::vector<std::string> parts;
         std::istringstream iss(fen);
@@ -122,14 +122,238 @@ namespace Chess {
             position.FullmoveCounter += c - '0';
         }
 
+        LOG_INFO("Number of available moves to depth 3: %i", position_perft(position, 3));
+
         return position;
     }
 
-    std::string write_position(Position position) {
+    std::string position_write(Position position) {
         return "Writing positions to FEN strings not yet implemented.";
     }
 
-    Position create_default_position() {
-        return read_position(default_game_fen);
+    Position position_default() {
+        return position_read(default_game_fen);
+    }
+
+    Position position_apply_move(Position position, i32 move) {
+        i32 piece = position.Board[move_get_target(move)];
+        position.Board[move_get_target(move)] = position.Board[move_get_origin(move)];
+        position.Board[move_get_origin(move)] = PIECE_NONE;
+        if (move_is_en_passant(move)) {
+            auto capture_location = get_location(get_file(position.EnPassantTarget), get_rank(move_get_origin(move)));
+            position.Board[capture_location] = PIECE_NONE;
+        }
+        position.EnPassantTarget = BOARD_INVALID_CELL;
+        if ((move & MOVE_FLAG_MASK) == MOVE_PAWN_DOUBLE_STEP) {
+            position.EnPassantTarget = (move_get_target(move) + move_get_origin(move)) / 2;
+        }
+        position.Player = (position.Player & PIECE_WHITE) ? PIECE_BLACK : PIECE_WHITE;
+        return position;
+    }
+
+    std::vector<i32> position_generate_moves(Position position) {
+        std::vector<i32> moves;
+        for (i32 origin = 0; origin < 64; origin++) {
+            i32 piece = position.Board[origin];
+            if (piece & position.Player) {
+                i32 piece_type = (piece & PIECE_TYPE_MASK);
+                switch (piece_type) {
+                    case PIECE_PAWN:
+                        position_generate_pawn_moves(position, moves, origin, piece);
+                        break;
+                    case PIECE_KNIGHT:
+                        position_generate_knight_moves(position, moves, origin, piece);
+                        break;
+                    case PIECE_ROOK:
+                        position_generate_orthogonal_sliding_moves(position, moves, origin, piece);
+                        break;
+                    case PIECE_BISHOP:
+                        position_generate_diagonal_sliding_moves(position, moves, origin, piece);
+                        break;
+                    case PIECE_QUEEN:
+                        position_generate_orthogonal_sliding_moves(position, moves, origin, piece);
+                        position_generate_diagonal_sliding_moves(position, moves, origin, piece);
+                        break;
+                    case PIECE_KING:
+                        position_generate_king_moves(position, moves, origin, piece);
+                }
+            }
+        }
+        return moves;
+    }
+
+    void position_generate_pawn_moves(const Position& position, std::vector<i32>& moves, i32 origin, i32 piece) {
+        i32 forward = (piece & PIECE_WHITE) ? 8 : -8;
+        i32 target = origin + forward;
+        i32 file = get_file(origin);
+        i32 rank = get_rank(origin);
+
+        //SINGLE STEP
+        if (!position.Board[target]) {
+            if (get_rank(target) % 7 == 0) {
+                moves.push_back(move_create(origin, target, MOVE_PROMOTE_BISHOP));
+                moves.push_back(move_create(origin, target, MOVE_PROMOTE_KNIGHT));
+                moves.push_back(move_create(origin, target, MOVE_PROMOTE_ROOK)); 
+                moves.push_back(move_create(origin, target, MOVE_PROMOTE_QUEEN));                
+            } else {
+                moves.push_back(move_create(origin, target));
+            }
+            //DOUBLE STEP ONLY POSSIBLE IF SINGLE WAS
+            if (!pawn_has_moved(piece, origin)) {
+                target = origin + 2*forward;
+                if (!position.Board[target]) {
+                    moves.push_back(move_create(origin, target, MOVE_PAWN_DOUBLE_STEP));
+                }
+            }
+        }
+
+        //DIAGONAL CAPTURE
+        if (file != 0) {
+            target = origin + forward - 1;
+            if (are_opponents(piece, position.Board[target])) {
+                if (get_rank(target) % 7 == 0) {
+                    moves.push_back(move_create(origin, target, MOVE_PROMOTE_CAPTURE_BISHOP));
+                    moves.push_back(move_create(origin, target, MOVE_PROMOTE_CAPTURE_KNIGHT));
+                    moves.push_back(move_create(origin, target, MOVE_PROMOTE_CAPTURE_ROOK)); 
+                    moves.push_back(move_create(origin, target, MOVE_PROMOTE_CAPTURE_QUEEN));                
+                } else {
+                    moves.push_back(move_create(origin, target, MOVE_CAPTURE));
+                }
+            }
+            if (target == position.EnPassantTarget) {
+                moves.push_back(move_create(origin, target, MOVE_EN_PASSANT));
+            }
+        }  
+        if (file != 7) {
+            target = origin + forward + 1;
+            if (are_opponents(piece, position.Board[target])) {
+                if (get_rank(target) % 7 == 0) {
+                    moves.push_back(move_create(origin, target, MOVE_PROMOTE_CAPTURE_BISHOP));
+                    moves.push_back(move_create(origin, target, MOVE_PROMOTE_CAPTURE_KNIGHT));
+                    moves.push_back(move_create(origin, target, MOVE_PROMOTE_CAPTURE_ROOK)); 
+                    moves.push_back(move_create(origin, target, MOVE_PROMOTE_CAPTURE_QUEEN));                
+                } else {
+                    moves.push_back(move_create(origin, target, MOVE_CAPTURE));
+                }
+            }
+            if (target == position.EnPassantTarget) {
+                moves.push_back(move_create(origin, target, MOVE_EN_PASSANT));
+            }
+        }
+    }
+
+    void position_generate_knight_moves(const Position& position, std::vector<i32>& moves, i32 origin, i32 piece) {
+        i32 file = get_file(origin);
+        i32 rank = get_rank(origin);
+
+        i32 ranks[8] = { // DEFINITELY A BETTER WAY BUT I DONT CARE
+            rank + 1, rank + 1,
+            rank - 1, rank - 1,
+            rank + 2, rank + 2,
+            rank - 2, rank - 2
+        };
+
+        i32 files[8] = {
+            file + 2, file - 2,
+            file + 2, file - 2,
+            file + 1, file - 1,
+            file + 1, file - 1
+        };   
+
+        for (i32 i = 0; i < 8; i++) {
+            if (is_location_on_board(files[i], ranks[i])) {
+                i32 target = get_location(files[i], ranks[i]);
+                if (!position.Board[target]) {
+                    moves.push_back(move_create(origin, target));
+                } else if (are_opponents(piece, position.Board[target])) {
+                    moves.push_back(move_create(origin, target, MOVE_CAPTURE));
+                }
+            }
+        }
+    }
+
+    void position_generate_orthogonal_sliding_moves(const Position& position, std::vector<i32>& moves, i32 origin, i32 piece) {
+        i32 fileshifts[8] = {1, -1, 0, 0, 1, -1, 1, -1};
+        i32 rankshifts[8] = {0, 0, 1, -1, 1, -1, -1, 1};
+        
+        i32 start = (!can_slide_orthogonal(piece)) ? 4 : 0;
+        i32 end = (!can_slide_diagonal(piece)) ? 4 : 8;
+        
+        for (i32 i = start; i < end; i++) {
+            bool obstructed = false;
+            i32 file = get_file(origin);
+            i32 rank = get_rank(origin);
+            i32 target = origin;
+            while (!obstructed) {
+                file += fileshifts[i];
+                rank += rankshifts[i];
+                if (is_location_on_board(file, rank)) {
+                    if (are_opponents(piece, position.Board[get_location(file, rank)])) {
+                        moves.push_back(move_create(origin, get_location(file, rank), MOVE_CAPTURE));
+                        obstructed = true;
+                    } else if (!position.Board[get_location(file, rank)]) {
+                        moves.push_back(move_create(origin, get_location(file, rank)));
+                    } else {
+                        obstructed = true;
+                    }
+                } else {
+                    obstructed = true;
+                }
+            }
+        }
+    }
+
+    void position_generate_diagonal_sliding_moves(const Position& position, std::vector<i32>& moves, i32 origin, i32 piece) {
+        i32 fileshifts[4] = {1, -1, 1, -1};
+        i32 rankshifts[4] = {1, -1, -1, 1};
+        
+        for (i32 i = 0; i < 4; i++) {
+            bool obstructed = false;
+            i32 file = get_file(origin);
+            i32 rank = get_rank(origin);
+            i32 target = origin;
+            while (!obstructed) {
+                file += fileshifts[i];
+                rank += rankshifts[i];
+                if (is_location_on_board(file, rank)) {
+                    if (are_opponents(piece, position.Board[get_location(file, rank)])) {
+                        moves.push_back(move_create(origin, get_location(file, rank), MOVE_CAPTURE));
+                        obstructed = true;
+                    } else if (!position.Board[get_location(file, rank)]) {
+                        moves.push_back(move_create(origin, get_location(file, rank)));
+                    } else {
+                        obstructed = true;
+                    }
+                } else {
+                    obstructed = true;
+                }
+            }
+        }
+    }
+
+    void position_generate_king_moves(const Position& position, std::vector<i32>& moves, i32 origin, i32 piece) {
+        for (i32 file = get_file(origin) - 1; file < get_file(origin) + 2; file++) {
+            for (i32 rank = get_rank(origin) - 1; rank < get_rank(origin) + 2; rank++) {
+                if (is_location_on_board(file, rank)) {
+                    if (are_opponents(piece, position.Board[get_location(file, rank)])) {
+                        moves.push_back(move_create(origin, get_location(file, rank), MOVE_CAPTURE));
+                    } else if (!position.Board[get_location(file, rank)]) {
+                        moves.push_back(move_create(origin, get_location(file, rank)));
+                    }
+                }
+            }
+        }
+    }
+
+    i32 position_perft(Position position, i32 depth) {
+        i32 count = 0;
+        if (depth == 1) {
+            return position_generate_moves(position).size();
+        }
+
+        for (i32 move : position_generate_moves(position)) {
+            count += position_perft(position_apply_move(position, move), depth-1);
+        }
+        return count;
     }
 }
