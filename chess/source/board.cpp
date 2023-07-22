@@ -11,13 +11,7 @@ namespace Chess {
 
     void enumerate_moves(const std::unique_ptr<GameData>& state) {
         state->LegalMoves.clear(); //SLOW BECAUSE WILL HAVE TO HEAP-REALLOCATE AS MOVELIST GROWS, TEMPORARY
-        for (i32 origin = 0; origin < 64; origin++) {
-            i32 piece = state->PositionHistory.back().Board[origin];
-            if (piece & state->PositionHistory.back().Player) {
-                i32 piece_type = (piece & PIECE_TYPE_MASK);
-                state->LegalMoves = position_generate_moves(state->PositionHistory.back());
-            }
-        }
+        state->LegalMoves = position_generate_moves(state->PositionHistory.back());
     }
 
     void update_attacked_cells(const std::unique_ptr<GameData>& state) {
@@ -150,20 +144,6 @@ namespace Chess {
         if (!state->PositionHistory.back().Board[get_location(file, rank)]) {
             game_on_cell_deselect(state);
             return;
-        }
-    }
-
-    void game_move(const std::unique_ptr<GameData>& state, i32 move) {
-        i32 piece = state->PositionHistory.back().Board[move_get_target(move)];
-        state->PositionHistory.back().Board[move_get_target(move)] = state->PositionHistory.back().Board[move_get_origin(move)];
-        state->PositionHistory.back().Board[move_get_origin(move)] = PIECE_NONE;
-        if (move_is_en_passant(move)) {
-            auto capture_location = get_location(get_file(state->PositionHistory.back().EnPassantTarget), get_rank(move_get_origin(move)));
-            state->PositionHistory.back().Board[capture_location] = PIECE_NONE;
-        }
-        state->PositionHistory.back().EnPassantTarget = BOARD_INVALID_CELL;
-        if ((move & MOVE_FLAG_MASK) == MOVE_PAWN_DOUBLE_STEP) {
-            state->PositionHistory.back().EnPassantTarget = (move_get_target(move) + move_get_origin(move)) / 2;
         }
     }
 
