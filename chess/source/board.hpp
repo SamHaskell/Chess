@@ -28,14 +28,9 @@ namespace Chess {
     void update_attacked_cells(const std::unique_ptr<GameData>& state);
     void update_highlighted_cells(const std::unique_ptr<GameData>& state);
 
-    void emplace_pawn_moves(const std::unique_ptr<GameData>& state, std::vector<i32>& moves, i32 origin, i32 piece);
-    void emplace_knight_moves(const std::unique_ptr<GameData>& state, std::vector<i32>& moves, i32 origin, i32 piece);
-    void emplace_orthogonal_sliding_moves(const std::unique_ptr<GameData>& state, std::vector<i32>& moves, i32 origin, i32 piece);
-    void emplace_diagonal_sliding_moves(const std::unique_ptr<GameData>& state, std::vector<i32>& moves, i32 origin, i32 piece);
-    void emplace_king_moves(const std::unique_ptr<GameData>& state, std::vector<i32>& moves, i32 origin, i32 piece);
-
     std::unique_ptr<GameData> game_create_from_fen(const std::string& fen);
     std::unique_ptr<GameData> game_create_default();
+    
     void game_load_textures(const std::unique_ptr<GameData>& state);
     void game_render(const std::unique_ptr<GameData>& state, Wigner::SceneData scene);
     void game_on_cell_deselect(const std::unique_ptr<GameData>& state);

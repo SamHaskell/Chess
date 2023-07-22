@@ -148,7 +148,7 @@ namespace Chess {
             position.EnPassantTarget = (move_get_target(move) + move_get_origin(move)) / 2;
         }
         if (move_is_castling(move)) {
-            
+            // TODO: ADD CASTLING HERE ONCE IMPLEMENTED IN MOVEGEN
         }
         position.Player = (position.Player & PIECE_WHITE) ? PIECE_BLACK : PIECE_WHITE;
         return position;
@@ -350,15 +350,23 @@ namespace Chess {
         // CASTLING
         if (position.Player & PIECE_WHITE) {
             if (position.CastlingFlags & CASTLE_WHITE_KING) {
-                // WHITE KING SIDE
+                if (!(position.Board[5] | position.Board[6])) {
+                    moves.push_back(move_create(origin, origin + 2,  MOVE_KING_CASTLE));
+                }
             } else if (position.CastlingFlags & CASTLE_WHITE_QUEEN) {
-                // WHITE QUEEN SIDE
+                if (!position.Board[1] && !position.Board[2] && !position.Board[3]) {
+                    moves.push_back(move_create(origin, origin - 2,  MOVE_QUEEN_CASTLE));
+                }
             }
         } else {
             if (position.CastlingFlags & CASTLE_BLACK_KING) {
-                // BLACK KING SIDE
+                if (!(position.Board[61] | position.Board[62])) {
+                    moves.push_back(move_create(origin, origin + 2,  MOVE_KING_CASTLE));
+                }
             } else if (position.CastlingFlags & CASTLE_BLACK_QUEEN) {
-                // BLACK QUEEN SIDE
+                if (!position.Board[57] && !position.Board[58] && !position.Board[59]) {
+                    moves.push_back(move_create(origin, origin - 2,  MOVE_QUEEN_CASTLE));
+                }
             }
         }
     }
