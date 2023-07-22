@@ -147,12 +147,16 @@ namespace Chess {
         if ((move & MOVE_FLAG_MASK) == MOVE_PAWN_DOUBLE_STEP) {
             position.EnPassantTarget = (move_get_target(move) + move_get_origin(move)) / 2;
         }
+        if (move_is_castling(move)) {
+            
+        }
         position.Player = (position.Player & PIECE_WHITE) ? PIECE_BLACK : PIECE_WHITE;
         return position;
     }
 
     std::vector<i32> position_generate_moves(Position position) {
         std::vector<i32> moves;
+        std::set<i32> attacked_cells;
         for (i32 origin = 0; origin < 64; origin++) {
             i32 piece = position.Board[origin];
             if (piece & position.Player) {
@@ -334,13 +338,27 @@ namespace Chess {
     void position_generate_king_moves(const Position& position, std::vector<i32>& moves, i32 origin, i32 piece) {
         for (i32 file = get_file(origin) - 1; file < get_file(origin) + 2; file++) {
             for (i32 rank = get_rank(origin) - 1; rank < get_rank(origin) + 2; rank++) {
-                if (is_location_on_board(file, rank)) {
-                    if (are_opponents(piece, position.Board[get_location(file, rank)])) {
-                        moves.push_back(move_create(origin, get_location(file, rank), MOVE_CAPTURE));
-                    } else if (!position.Board[get_location(file, rank)]) {
-                        moves.push_back(move_create(origin, get_location(file, rank)));
-                    }
+                if (!is_location_on_board(file, rank)) { continue; }
+                if (are_opponents(piece, position.Board[get_location(file, rank)])) {
+                    moves.push_back(move_create(origin, get_location(file, rank), MOVE_CAPTURE));
+                } else if (!position.Board[get_location(file, rank)]) {
+                    moves.push_back(move_create(origin, get_location(file, rank)));
                 }
+            }
+        }
+
+        // CASTLING
+        if (position.Player & PIECE_WHITE) {
+            if (position.CastlingFlags & CASTLE_WHITE_KING) {
+                // WHITE KING SIDE
+            } else if (position.CastlingFlags & CASTLE_WHITE_QUEEN) {
+                // WHITE QUEEN SIDE
+            }
+        } else {
+            if (position.CastlingFlags & CASTLE_BLACK_KING) {
+                // BLACK KING SIDE
+            } else if (position.CastlingFlags & CASTLE_BLACK_QUEEN) {
+                // BLACK QUEEN SIDE
             }
         }
     }
@@ -352,7 +370,7 @@ namespace Chess {
         }
 
         for (i32 move : position_generate_moves(position)) {
-            count += position_perft(position_apply_move(position, move), depth-1);
+            count += position_perft(position_apply_move(position, move), depth - 1);
         }
         return count;
     }

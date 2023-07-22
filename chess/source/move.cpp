@@ -9,12 +9,12 @@ namespace Chess {
         return origin | (target << 6) | flags;
     }
 
-    i32 move_get_target(i32 movecode) {
-        return (movecode & MOVE_TARGET_MASK) >> 6;
+    i32 move_get_target(i32 move) {
+        return (move & MOVE_TARGET_MASK) >> 6;
     }
 
-    i32 move_get_origin(i32 movecode) {
-        return (movecode & MOVE_ORIGIN_MASK);
+    i32 move_get_origin(i32 move) {
+        return (move & MOVE_ORIGIN_MASK);
     }
 
     i32 get_rank(i32 location) {
@@ -29,17 +29,17 @@ namespace Chess {
         return (rank*8) + file;
     }
 
-    bool move_is_en_passant(i32 movecode) {
-        return (movecode & MOVE_FLAG_MASK) == MOVE_EN_PASSANT;
+    bool move_is_en_passant(i32 move) {
+        return (move & MOVE_FLAG_MASK) == MOVE_EN_PASSANT;
     }
 
-    bool move_is_castling(i32 movecode) {
-        auto flags = (movecode & MOVE_FLAG_MASK);
+    bool move_is_castling(i32 move) {
+        auto flags = (move & MOVE_FLAG_MASK);
         return (flags == MOVE_KING_CASTLE) || (flags == MOVE_QUEEN_CASTLE);
     }
 
-    bool move_is_promotion(i32 movecode) {
-        return (movecode & (8 << 12));
+    bool move_is_promotion(i32 move) {
+        return (move & (8 << 12));
     }
 
     bool pawn_has_moved(i32 piece, i32 location) {

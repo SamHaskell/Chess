@@ -2,6 +2,9 @@
 
 #include <Wigner.hpp>
 
+#include <vector>
+#include <set>
+
 namespace Chess {
     enum CastlingFlags {
         CASTLE_WHITE_KING = (1 << 0),
@@ -21,6 +24,8 @@ namespace Chess {
         i32 HalfmoveClock;
         i32 FullmoveCounter;
     };
+
+    bool move_is_legal(Position position, i32 move);
 
     Position position_read(const std::string& fen);
     std::string position_write(Position position);

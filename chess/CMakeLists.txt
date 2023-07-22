@@ -12,6 +12,7 @@ set(
     ${PROJECT_SOURCE_DIR}/source/position.cpp
     ${PROJECT_SOURCE_DIR}/source/board.cpp
     ${PROJECT_SOURCE_DIR}/source/move.cpp
+    ${PROJECT_SOURCE_DIR}/source/movegen.cpp
     ${PROJECT_SOURCE_DIR}/source/piece.cpp
 )
 
@@ -21,6 +22,7 @@ set(
     ${PROJECT_SOURCE_DIR}/source/position.hpp
     ${PROJECT_SOURCE_DIR}/source/board.hpp
     ${PROJECT_SOURCE_DIR}/source/move.hpp
+    ${PROJECT_SOURCE_DIR}/source/movegen.hpp
     ${PROJECT_SOURCE_DIR}/source/piece.hpp
 )
 

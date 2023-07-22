@@ -2,6 +2,7 @@
 
 namespace Chess {
     bool piece_from_char(u8 c, i32& piece) {
+        // DON'T LOOK MARION, KEEP YOUR EYES SHUT!
         switch (c) {
             case 'P':
                 piece = PIECE_WHITE | PIECE_PAWN;
