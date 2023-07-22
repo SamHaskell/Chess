@@ -121,9 +121,6 @@ namespace Chess {
             position.FullmoveCounter *= 10; 
             position.FullmoveCounter += c - '0';
         }
-
-        LOG_INFO("Number of available moves to depth 3: %i", position_perft(position, 3));
-
         return position;
     }
 
@@ -136,20 +133,53 @@ namespace Chess {
     }
 
     Position position_apply_move(Position position, i32 move) {
-        i32 piece = position.Board[move_get_target(move)];
-        position.Board[move_get_target(move)] = position.Board[move_get_origin(move)];
+        i32 origin = move_get_origin(move);
+        i32 target = move_get_target(move);
+        i32 piece_to_move = position.Board[origin];
+        i32 kingside_rights = (position.Player & PIECE_WHITE) ? CASTLE_WHITE_KING : CASTLE_BLACK_KING;
+        i32 queenside_rights = (position.Player & PIECE_WHITE) ? CASTLE_WHITE_QUEEN : CASTLE_BLACK_QUEEN;
+
+        // UPDATE CASTLING RIGHTS
+        if ((piece_to_move & PIECE_TYPE_MASK) == PIECE_KING) {
+            position_remove_castling_rights(position, kingside_rights | queenside_rights);
+        } else if ((piece_to_move & PIECE_TYPE_MASK) == PIECE_ROOK) {
+            if (get_file(origin) == 0) {
+                position_remove_castling_rights(position, queenside_rights);
+            } else if (get_file(origin) == 7) {
+                position_remove_castling_rights(position, kingside_rights);
+            }
+        }
+
+        // GENERIC MOVE
+        position.Board[move_get_target(move)] = piece_to_move;
         position.Board[move_get_origin(move)] = PIECE_NONE;
+
+        // EN PASSANT
         if (move_is_en_passant(move)) {
-            auto capture_location = get_location(get_file(position.EnPassantTarget), get_rank(move_get_origin(move)));
+            auto capture_location = get_location(get_file(position.EnPassantTarget), get_rank(origin));
             position.Board[capture_location] = PIECE_NONE;
         }
+        
+        // PAWN DOUBLE PUSH
         position.EnPassantTarget = BOARD_INVALID_CELL;
         if ((move & MOVE_FLAG_MASK) == MOVE_PAWN_DOUBLE_STEP) {
-            position.EnPassantTarget = (move_get_target(move) + move_get_origin(move)) / 2;
+            position.EnPassantTarget = (target + origin) / 2;
         }
-        if (move_is_castling(move)) {
-            // TODO: ADD CASTLING HERE ONCE IMPLEMENTED IN MOVEGEN
+
+        // CASTLING
+        i32 rook_target = BOARD_INVALID_CELL;
+        i32 rook;  
+        if ((move & MOVE_FLAG_MASK) == MOVE_KING_CASTLE) {
+            rook_target = (position.Player & PIECE_WHITE) ? 7 : 63;
+        } else if ((move & MOVE_FLAG_MASK) == MOVE_QUEEN_CASTLE) {
+            rook_target = (position.Player & PIECE_WHITE) ? 0 : 56;
         }
+        if (rook_target != BOARD_INVALID_CELL) {
+            rook = position.Board[rook_target];
+            position.Board[rook_target] = PIECE_NONE;
+            position.Board[(target + origin) / 2] = rook;
+        }
+
         position.Player = (position.Player & PIECE_WHITE) ? PIECE_BLACK : PIECE_WHITE;
         return position;
     }
@@ -383,5 +413,12 @@ namespace Chess {
             count += position_perft(position_apply_move(position, move), depth - 1);
         }
         return count;
+    }
+
+    void position_remove_castling_rights(Position& position, i32 flags) {
+        LOG_DEBUG("Removing castling rights");
+        if (position.CastlingFlags & flags) {
+            position.CastlingFlags ^= flags;
+        }
     }
 }

@@ -168,7 +168,7 @@ namespace Chess {
     }
 
     void game_on_move(const std::unique_ptr<GameData>& state, i32 move) {
-        game_move(state, move);
+        state->PositionHistory.push_back(position_apply_move(state->PositionHistory.back(), move));
         game_on_cell_deselect(state);
         game_on_turn_end(state);
     }
@@ -176,7 +176,6 @@ namespace Chess {
     void game_on_turn_end(const std::unique_ptr<GameData>& state) {
         enumerate_moves(state);
         update_attacked_cells(state);
-        state->PositionHistory.back().Player = (state->PositionHistory.back().Player & PIECE_WHITE) ? PIECE_BLACK : PIECE_WHITE;
         enumerate_moves(state);
     }
 }
