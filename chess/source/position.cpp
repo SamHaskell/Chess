@@ -353,8 +353,9 @@ namespace Chess {
                 if (!(position.Board[5] | position.Board[6])) {
                     moves.push_back(move_create(origin, origin + 2,  MOVE_KING_CASTLE));
                 }
-            } else if (position.CastlingFlags & CASTLE_WHITE_QUEEN) {
-                if (!position.Board[1] && !position.Board[2] && !position.Board[3]) {
+            }
+            if (position.CastlingFlags & CASTLE_WHITE_QUEEN) {
+                if (!(position.Board[1] | position.Board[2] | position.Board[3])) {
                     moves.push_back(move_create(origin, origin - 2,  MOVE_QUEEN_CASTLE));
                 }
             }
@@ -363,8 +364,9 @@ namespace Chess {
                 if (!(position.Board[61] | position.Board[62])) {
                     moves.push_back(move_create(origin, origin + 2,  MOVE_KING_CASTLE));
                 }
-            } else if (position.CastlingFlags & CASTLE_BLACK_QUEEN) {
-                if (!position.Board[57] && !position.Board[58] && !position.Board[59]) {
+            }
+            if (position.CastlingFlags & CASTLE_BLACK_QUEEN) {
+                if (!(position.Board[57] | position.Board[58] | position.Board[59])) {
                     moves.push_back(move_create(origin, origin - 2,  MOVE_QUEEN_CASTLE));
                 }
             }
