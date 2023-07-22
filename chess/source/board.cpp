@@ -9,19 +9,24 @@ namespace Chess {
     static Wigner::Color COLOR_RED_TINT = {1.0f, 0.2f, 0.2f, 0.2f};
     static Wigner::Color COLOR_BLUE_TINT = {0.2f, 0.2f, 1.0f, 0.3f};
 
-    void enumerate_moves(const std::unique_ptr<GameData>& state) {
-        state->LegalMoves.clear(); //SLOW BECAUSE WILL HAVE TO HEAP-REALLOCATE AS MOVELIST GROWS, TEMPORARY
-        state->LegalMoves = position_generate_moves(state->PositionHistory.back());
-    }
-
-    void update_attacked_cells(const std::unique_ptr<GameData>& state) {
-        state->AttackedCells.clear();
+    void game_update_bitboards(const std::unique_ptr<GameData>& state) {
+        u64 attacked_bb = 0;
         for (i32 move : state->LegalMoves) {
-            state->AttackedCells.insert(move_get_target(move));
+            i32 target = move_get_target(move);
+            i32 origin = move_get_origin(move);
+            i32 piece_type = state->PositionHistory.back().Board[origin] & PIECE_TYPE_MASK;
+            if (piece_type == PIECE_PAWN) {
+                if ((move & MOVE_FLAG_MASK) == MOVE_CAPTURE) {
+                    // attacked_bb |= (1ULL << target);                    
+                }
+            } else {
+                attacked_bb |= (1ULL << target);
+            }
         }
+        state->BitBoards.AttackedCells = attacked_bb;
     }
 
-    void update_highlighted_moves(const std::unique_ptr<GameData>& state) {
+    void game_update_highlighted_moves(const std::unique_ptr<GameData>& state) {
         state->HighlightedMoves.clear();
         state->HighlightedCells.clear();
         for (i32 move : state->LegalMoves) {
@@ -36,10 +41,14 @@ namespace Chess {
         auto state = std::make_unique<GameData>();
         game_load_textures(state);
 
-        state->PositionHistory.push_back(position_read(fen));
+        Position position = position_read(fen);
+        BitBoards bitboards = state->BitBoards;
+
+        state->PositionHistory.push_back(position);
         state->SelectedCell = BOARD_INVALID_CELL;
 
-        enumerate_moves(state);
+        state->LegalMoves.clear();
+        state->LegalMoves = position_generate_legal_moves(position, bitboards);
 
         return state;
     }
@@ -48,10 +57,14 @@ namespace Chess {
         auto state = std::make_unique<GameData>();
         game_load_textures(state);
 
-        state->PositionHistory.push_back(position_default());
+        Position position = position_default();
+        BitBoards bitboards = state->BitBoards;
+
+        state->PositionHistory.push_back(position);
         state->SelectedCell = BOARD_INVALID_CELL;
 
-        enumerate_moves(state);
+        state->LegalMoves.clear();
+        state->LegalMoves = position_generate_legal_moves(position, bitboards);
 
         return state;
     }
@@ -72,9 +85,11 @@ namespace Chess {
             Wigner::draw_quad(scene, state->BoardRect.X + dx * get_file(state->SelectedCell), state->BoardRect.Y + dy * get_rank(state->SelectedCell), dx, dy, selected_piece_color);
         }
 
-        // for (i32 target : state->AttackedCells) {
-        //     Wigner::draw_quad(scene, state->BoardRect.X + dx * get_file(target), state->BoardRect.Y + dy * get_rank(target), dx, dy, COLOR_RED_TINT);
-        // }
+        for (i32 i = 0; i < 64; i++) {
+            if (state->BitBoards.AttackedCells & (1ULL << i)) {
+                Wigner::draw_quad(scene, state->BoardRect.X + dx * get_file(i), state->BoardRect.Y + dy * get_rank(i), dx, dy, COLOR_RED_TINT);
+            }
+        }
 
         for (i32 target : state->HighlightedCells) {
             Wigner::draw_quad(scene, state->BoardRect.X + dx * get_file(target), state->BoardRect.Y + dy * get_rank(target), dx, dy, COLOR_BLUE_TINT);
@@ -132,7 +147,7 @@ namespace Chess {
         } 
         if (state->PositionHistory.back().Board[get_location(file, rank)] & state->PositionHistory.back().Player) {
             state->SelectedCell = get_location(file, rank);
-            update_highlighted_moves(state);
+            game_update_highlighted_moves(state);
             return;
         }
         for (i32 move : state->HighlightedMoves) {
@@ -148,14 +163,23 @@ namespace Chess {
     }
 
     void game_on_move(const std::unique_ptr<GameData>& state, i32 move) {
-        state->PositionHistory.push_back(position_apply_move(state->PositionHistory.back(), move));
-        game_on_cell_deselect(state);
-        game_on_turn_end(state);
-    }
+        // Apply the move and push onto the move history
+        BitBoards bitboards = state->BitBoards;
+        Position new_position = position_apply_move(state->PositionHistory.back(), move);
+        
+        // Now calculate all possible moves from new position and update bitboards for next players movegen
 
-    void game_on_turn_end(const std::unique_ptr<GameData>& state) {
-        enumerate_moves(state);
-        update_attacked_cells(state);
-        enumerate_moves(state);
+        state->LegalMoves.clear();
+        state->LegalMoves = position_generate_legal_moves(new_position, bitboards);
+
+        new_position.Player = (new_position.Player & PIECE_WHITE) ? PIECE_BLACK : PIECE_WHITE;
+        state->PositionHistory.push_back(new_position);
+
+        game_update_bitboards(state);
+        game_on_cell_deselect(state);
+
+        // Calculate moves for new player, given updated bitboards from previous move
+        state->LegalMoves.clear();
+        state->LegalMoves = position_generate_legal_moves(new_position, bitboards);
     }
 }

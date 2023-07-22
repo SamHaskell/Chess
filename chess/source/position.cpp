@@ -180,8 +180,11 @@ namespace Chess {
             position.Board[(target + origin) / 2] = rook;
         }
 
-        position.Player = (position.Player & PIECE_WHITE) ? PIECE_BLACK : PIECE_WHITE;
         return position;
+    }
+
+    std::vector<i32> position_generate_legal_moves(Position position, BitBoards bitboards) {
+        return position_generate_moves(position);
     }
 
     std::vector<i32> position_generate_moves(Position position) {
@@ -192,6 +195,8 @@ namespace Chess {
             if (piece & position.Player) {
                 i32 piece_type = (piece & PIECE_TYPE_MASK);
                 switch (piece_type) {
+                    case PIECE_NONE:
+                        break;
                     case PIECE_PAWN:
                         position_generate_pawn_moves(position, moves, origin, piece);
                         break;
@@ -210,6 +215,7 @@ namespace Chess {
                         break;
                     case PIECE_KING:
                         position_generate_king_moves(position, moves, origin, piece);
+                        break;
                 }
             }
         }

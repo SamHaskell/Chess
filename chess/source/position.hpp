@@ -6,6 +6,12 @@
 #include <set>
 
 namespace Chess {
+
+    struct BitBoards {
+        u64 AttackedCells;
+        std::vector<u64> PinLines;
+    };
+
     enum CastlingFlags {
         CASTLE_WHITE_KING = (1 << 0),
         CASTLE_BLACK_KING = (1 << 1),
@@ -32,6 +38,7 @@ namespace Chess {
     Position position_default();
 
     Position position_apply_move(Position position, i32 move);
+    std::vector<i32> position_generate_legal_moves(Position position, BitBoards bitboards);
     std::vector<i32> position_generate_moves(Position position);
     i32 position_perft(Position position, i32 depth);
 
